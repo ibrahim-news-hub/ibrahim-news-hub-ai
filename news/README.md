@@ -1,1 +1,11 @@
 
+/
+├── index.html
+├── style.css
+├── script.js
+├── images/
+├── pages/
+│   ├── about.html
+│   ├── contact.html
+│   └── privacy.html
+└── news/
