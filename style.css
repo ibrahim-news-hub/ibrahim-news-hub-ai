@@ -1,93 +1,109 @@
-
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
 body{
-    font-family:Arial, sans-serif;
-    background:#f4f4f4;
-    color:#333;
+  font-family:Arial,sans-serif;
+  background:#f5f5f5;
+  color:#222;
 }
 
-header{
-    background:#008000;
-    color:white;
-    padding:20px;
-    text-align:center;
+.top-header{
+  background:#0b7a2f;
+  color:#fff;
+  padding:20px;
+  text-align:center;
 }
 
-header h1{
-    margin-bottom:10px;
+.logo h1{
+  font-size:32px;
+}
+
+.logo p{
+  margin-top:5px;
+}
+
+nav{
+  margin-top:20px;
 }
 
 nav a{
-    color:white;
-    text-decoration:none;
-    margin:0 12px;
-    font-weight:bold;
+  color:#fff;
+  text-decoration:none;
+  margin:0 12px;
+  font-weight:bold;
 }
 
 nav a:hover{
-    text-decoration:underline;
+  color:#ffd700;
+}
+
+.breaking{
+  background:#d10000;
+  color:#fff;
+  padding:12px;
+  font-weight:bold;
 }
 
 .hero{
-    background:#ffffff;
-    margin:20px;
-    padding:40px;
-    text-align:center;
-    border-radius:10px;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
+  background:#fff;
+  margin:25px;
+  padding:40px;
+  text-align:center;
+  border-radius:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,.12);
 }
 
 .hero h2{
-    color:#008000;
-    margin-bottom:10px;
+  color:#0b7a2f;
+  margin-bottom:15px;
 }
 
-.news{
-    padding:20px;
+.hero button{
+  margin-top:20px;
+  background:#0b7a2f;
+  color:#fff;
+  border:none;
+  padding:12px 25px;
+  border-radius:6px;
+  cursor:pointer;
 }
 
-.news h2{
-    margin-bottom:15px;
+.latest-news{
+  padding:25px;
+}
+
+.news-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:20px;
 }
 
 .card{
-    background:white;
-    padding:20px;
-    margin-bottom:20px;
-    border-radius:10px;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
+  background:#fff;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 3px 10px rgba(0,0,0,.12);
+}
+
+.card img{
+  width:100%;
+  display:block;
 }
 
 .card h3{
-    color:#008000;
-    margin-bottom:10px;
+  padding:15px;
+  color:#0b7a2f;
 }
 
-footer{
-    background:#222;
-    color:white;
-    text-align:center;
-    padding:20px;
-    margin-top:30px;
+.card p{
+  padding:0 15px 15px;
 }
 
-@media(max-width:768px){
-
-header{
-    padding:15px;
-}
-
-nav a{
-    display:block;
-    margin:10px 0;
-}
-
-.hero{
-    margin:10px;
-    padding:20px;
-}
+.card a{
+  display:block;
+  padding:15px;
+  text-decoration:none;
+  color:#d
