@@ -1,23 +1,28 @@
+import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
-export async function GET() {
-  return NextResponse.json({
-    message: "News writing API is working"
-  });
-}
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const { headline } = await request.json();
+
+    const response = await openai.responses.create({
+      model: "gpt-5.5",
+      input: `Rubuta cikakken labarin Hausa mai ƙwarewa game da wannan take: ${headline}`,
+    });
 
     return NextResponse.json({
-      message: "News received",
-      data: body,
+      news: response.output_text,
     });
   } catch (error) {
+    console.error(error);
+
     return NextResponse.json(
-      { error: "Invalid request" },
-      { status: 400 }
+      { error: "Failed to generate news" },
+      { status: 500 }
     );
   }
 }
