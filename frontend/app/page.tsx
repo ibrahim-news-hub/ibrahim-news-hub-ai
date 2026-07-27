@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   const btn = {
     display: "block" as const,
@@ -7,9 +9,9 @@ export default function Home() {
     fontSize: "18px",
     background: "#2563eb",
     color: "white",
-    border: "none",
     borderRadius: "10px",
-    cursor: "pointer",
+    textDecoration: "none",
+    textAlign: "center" as const,
   };
 
   return (
@@ -26,11 +28,15 @@ export default function Home() {
       <p>Professional AI News Dashboard</p>
 
       <div style={{ marginTop: "30px" }}>
-        <button style={btn}>📰 Create News</button>
+        <Link href="/create-news" style={btn}>
+          📰 Create News
+        </Link>
+
         <button style={btn}>✍️ AI Writer</button>
         <button style={btn}>🖼️ AI Images</button>
         <button style={btn}>📅 Facebook Auto Post</button>
         <button style={btn}>⚙️ Settings</button>
       </div>
     </main>
-  );}
+  );
+}
