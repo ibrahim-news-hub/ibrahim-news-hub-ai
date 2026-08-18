@@ -32,6 +32,7 @@ ${headline}
 Bayanan Labari:
 ${sourceText}
 `;
+
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
       {
@@ -41,7 +42,7 @@ ${sourceText}
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
+          model: "llama-3.1-8b-instant",
           messages: [
             {
               role: "user",
@@ -68,7 +69,8 @@ ${sourceText}
     const result = await response.json();
 
     const article =
-      result.choices?.[0]?.message?.content || "Ba a samu labari ba.";
+      result.choices?.[0]?.message?.content ||
+      "Ba a samu labari ba.";
 
     const { data, error } = await supabase
       .from("news")
@@ -83,6 +85,14 @@ ${sourceText}
 
     console.log("INSERT DATA:", data);
     console.log("INSERT ERROR:", error);
+
+    if (error) {
+      return NextResponse.json({
+        success: true,
+        article,
+        warning: "An samar da labarin amma ba a ajiye shi a database ba.",
+      });
+    }
 
     return NextResponse.json({
       success: true,
