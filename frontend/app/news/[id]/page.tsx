@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic";
-
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -7,6 +5,8 @@ import { notFound } from "next/navigation";
 type Props = {
   params: Promise<{ id: string }>;
 };
+
+export const dynamic = "force-dynamic";
 
 export default async function NewsArticlePage({ params }: Props) {
   const { id } = await params;
@@ -21,24 +21,23 @@ export default async function NewsArticlePage({ params }: Props) {
     notFound();
   }
 
-  const content = article.content || "Ba a samu cikakken bayanin wannan labarin ba.";
-
   return (
     <main
       style={{
-        maxWidth: "850px",
-        margin: "0 auto",
-        padding: "30px 20px",
-        fontFamily: "Arial, sans-serif",
+        maxWidth: "900px",
+        margin: "40px auto",
+        padding: "20px",
       }}
     >
-      {/* Back */}
       <Link
         href="/news"
         style={{
-          textDecoration: "none",
+          display: "inline-block",
+          marginBottom: "30px",
           color: "#2563eb",
+          fontSize: "20px",
           fontWeight: "bold",
+          textDecoration: "none",
         }}
       >
         ← Komawa Duk Labarai
@@ -46,82 +45,93 @@ export default async function NewsArticlePage({ params }: Props) {
 
       <article
         style={{
-          marginTop: "30px",
-          padding: "25px",
           border: "1px solid #e5e7eb",
-          borderRadius: "16px",
-          background: "#ffffff",
-          boxShadow: "0 4px 15px rgba(0,0,0,0.06)",
+          borderRadius: "18px",
+          overflow: "hidden",
+          background: "#fff",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
         }}
       >
-        {/* Category */}
-        <div
-          style={{
-            display: "inline-block",
-            padding: "6px 12px",
-            background: "#dbeafe",
-            color: "#1d4ed8",
-            borderRadius: "20px",
-            fontSize: "13px",
-            fontWeight: "bold",
-            marginBottom: "15px",
-          }}
-        >
-          📰 LABARAI
-        </div>
-
-        {/* Title */}
-        <h1
-          style={{
-            fontSize: "clamp(28px, 6vw, 42px)",
-            lineHeight: "1.25",
-            margin: "5px 0 25px",
-            color: "#111827",
-          }}
-        >
-          {article.title}
-        </h1>
-
-        {/* Content */}
-        <div
-          style={{
-            fontSize: "19px",
-            lineHeight: "1.9",
-            color: "#374151",
-            whiteSpace: "pre-wrap",
-          }}
-        >
-          {content.replace(/\*\*/g, "").trim()}
-        </div>
-
-        {/* Source */}
-        {article.source && (
-          <div
+        {article.image_url && (
+          <img
+            src={article.image_url}
+            alt={article.title}
             style={{
-              marginTop: "35px",
-              padding: "15px",
-              background: "#f3f4f6",
-              borderRadius: "10px",
-              color: "#4b5563",
+              width: "100%",
+              height: "360px",
+              objectFit: "cover",
+              display: "block",
             }}
-          >
-            <strong>Source / Bayanan Asali:</strong>
-            <p style={{ marginBottom: 0 }}>
-              {article.source}
-            </p>
-          </div>
+          />
         )}
 
-        {/* Back button */}
-        <div style={{ marginTop: "30px" }}>
+        <div style={{ padding: "30px" }}>
+          <div
+            style={{
+              display: "inline-block",
+              background: "#dbeafe",
+              color: "#1d4ed8",
+              padding: "9px 16px",
+              borderRadius: "20px",
+              fontWeight: "bold",
+              marginBottom: "20px",
+            }}
+          >
+            📰 {article.category || "General"}
+          </div>
+
+          <h1
+            style={{
+              fontSize: "42px",
+              lineHeight: "1.2",
+              marginBottom: "25px",
+            }}
+          >
+            {article.title}
+          </h1>
+
+          <div
+            style={{
+              fontSize: "20px",
+              lineHeight: "1.9",
+              color: "#374151",
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            {article.content}
+          </div>
+
+          {article.source && (
+            <div
+              style={{
+                marginTop: "35px",
+                padding: "20px",
+                background: "#f3f4f6",
+                borderRadius: "14px",
+              }}
+            >
+              <strong>Source / Bayanan Asali:</strong>
+
+              <p
+                style={{
+                  marginTop: "10px",
+                  lineHeight: "1.7",
+                }}
+              >
+                {article.source}
+              </p>
+            </div>
+          )}
+
           <Link
             href="/news"
             style={{
               display: "inline-block",
-              padding: "12px 18px",
+              marginTop: "30px",
               background: "#2563eb",
-              color: "#ffffff",
-              borderRadius: "8px",
+              color: "#fff",
+              padding: "14px 22px",
+              borderRadius: "10px",
               textDecoration: "none",
               fontWeight: "bold",
             }}
