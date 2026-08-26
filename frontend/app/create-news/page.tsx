@@ -5,17 +5,15 @@ import { useState } from "react";
 export default function CreateNews() {
   const [headline, setHeadline] = useState("");
   const [sourceText, setSourceText] = useState("");
+  const [category, setCategory] = useState("General");
+  const [imageUrl, setImageUrl] = useState("");
+  const [published, setPublished] = useState(true);
   const [news, setNews] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function generateNews() {
-    if (!headline.trim()) {
-      setNews("Da fatan za ka shigar da taken labari.");
-      return;
-    }
-
-    if (!sourceText.trim()) {
-      setNews("Da fatan za ka shigar da bayanan labarin.");
+    if (!headline.trim() || !sourceText.trim()) {
+      setNews("Da fatan za a cika taken labari da bayanin labari.");
       return;
     }
 
@@ -31,26 +29,25 @@ export default function CreateNews() {
         body: JSON.stringify({
           headline,
           sourceText,
+          category,
+          imageUrl,
+          published,
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok || data.success === false) {
-        if (data.details) {
-          setNews(
-            `${data.error || "An samu kuskure."}\n\n` +
-              `Details: ${data.details}\n` +
-              `Code: ${data.code || "N/A"}`
-          );
-        } else {
-          setNews(data.error || "An samu kuskure.");
-        }
-
-        return;
+        setNews(
+          data.details
+            ? `${data.error}\n\nDetails: ${data.details}\nCode: ${
+                data.code || "N/A"
+              }`
+            : data.error || "An samu kuskure."
+        );
+      } else {
+        setNews(data.article || "Ba a samu labari ba.");
       }
-
-      setNews(data.article || "Ba a samu labari ba.");
     } catch (error) {
       console.error(error);
       setNews("An samu matsala wajen haɗawa da server.");
@@ -62,40 +59,16 @@ export default function CreateNews() {
   return (
     <main
       style={{
-        maxWidth: "800px",
+        maxWidth: "700px",
         margin: "40px auto",
         padding: "20px",
       }}
     >
-      <h1
-        style={{
-          fontSize: "32px",
-          marginBottom: "10px",
-        }}
-      >
-        📰 Create News
-      </h1>
+      <h1>📰 Create News</h1>
 
-      <p
-        style={{
-          color: "#64748b",
-          fontSize: "17px",
-          marginBottom: "30px",
-        }}
-      >
-        Rubuta ko liƙa bayanan labari, sannan Ibrahim News Hub AI
-        zai samar da cikakken labari cikin Hausa.
+      <p style={{ color: "#666", marginBottom: "25px" }}>
+        Ƙirƙiri sabon labari ta amfani da Ibrahim News Hub AI.
       </p>
-
-      <label
-        style={{
-          display: "block",
-          fontWeight: "600",
-          marginBottom: "8px",
-        }}
-      >
-        Taken Labari
-      </label>
 
       <input
         type="text"
@@ -106,23 +79,50 @@ export default function CreateNews() {
           width: "100%",
           padding: "14px",
           fontSize: "18px",
-          marginBottom: "22px",
+          marginBottom: "15px",
           boxSizing: "border-box",
-          border: "1px solid #cbd5e1",
-          borderRadius: "10px",
-          outline: "none",
+          border: "1px solid #ddd",
+          borderRadius: "8px",
         }}
       />
 
-      <label
+      <select
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
         style={{
-          display: "block",
-          fontWeight: "600",
-          marginBottom: "8px",
+          width: "100%",
+          padding: "14px",
+          fontSize: "16px",
+          marginBottom: "15px",
+          border: "1px solid #ddd",
+          borderRadius: "8px",
+          background: "#fff",
         }}
       >
-        Bayanan Labari
-      </label>
+        <option value="General">📰 General</option>
+        <option value="Najeriya">🇳🇬 Najeriya</option>
+        <option value="Duniya">🌍 Duniya</option>
+        <option value="Technology">🤖 Technology</option>
+        <option value="Kasuwanci">💰 Kasuwanci</option>
+        <option value="Wasanni">⚽ Wasanni</option>
+        <option value="Viral">🔥 Viral</option>
+      </select>
+
+      <input
+        type="text"
+        placeholder="Image URL — misali https://..."
+        value={imageUrl}
+        onChange={(e) => setImageUrl(e.target.value)}
+        style={{
+          width: "100%",
+          padding: "14px",
+          fontSize: "16px",
+          marginBottom: "15px",
+          boxSizing: "border-box",
+          border: "1px solid #ddd",
+          borderRadius: "8px",
+        }}
+      />
 
       <textarea
         placeholder="Liƙa cikakken bayanin labari a nan..."
@@ -132,65 +132,70 @@ export default function CreateNews() {
         style={{
           width: "100%",
           padding: "14px",
-          fontSize: "17px",
-          marginBottom: "22px",
+          fontSize: "16px",
+          marginBottom: "15px",
           boxSizing: "border-box",
-          border: "1px solid #cbd5e1",
-          borderRadius: "10px",
+          border: "1px solid #ddd",
+          borderRadius: "8px",
           resize: "vertical",
-          lineHeight: "1.6",
-          outline: "none",
         }}
       />
+
+      <label
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          marginBottom: "20px",
+          fontSize: "16px",
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={published}
+          onChange={(e) => setPublished(e.target.checked)}
+        />
+        Publish News
+      </label>
 
       <button
         onClick={generateNews}
         disabled={loading}
         style={{
           width: "100%",
-          padding: "15px",
+          padding: "14px",
           background: loading ? "#94a3b8" : "#2563eb",
           color: "#fff",
           border: "none",
-          borderRadius: "10px",
-          fontSize: "19px",
-          fontWeight: "600",
+          borderRadius: "8px",
+          fontSize: "18px",
           cursor: loading ? "not-allowed" : "pointer",
         }}
       >
-        {loading ? "⏳ Ana rubuta labari..." : "✨ Generate News"}
+        {loading ? "Generating..." : "Generate News"}
       </button>
 
       {news && (
-        <section
+        <div
           style={{
             marginTop: "30px",
-            padding: "24px",
-            border: "1px solid #e2e8f0",
-            borderRadius: "12px",
+            padding: "20px",
+            border: "1px solid #ddd",
+            borderRadius: "8px",
             background: "#fff",
           }}
         >
-          <h2
-            style={{
-              fontSize: "22px",
-              marginBottom: "18px",
-            }}
-          >
-            📝 Generated News
-          </h2>
+          <h2>Generated News</h2>
 
-          <div
+          <p
             style={{
               whiteSpace: "pre-wrap",
-              lineHeight: "1.9",
-              fontSize: "18px",
-              color: "#1e293b",
+              lineHeight: "1.8",
             }}
           >
             {news}
-          </div>
-        </section>
+          </p>
+        </div>
       )}
     </main>
   );

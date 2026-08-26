@@ -3,9 +3,15 @@ import { supabase } from "@/lib/supabase";
 
 export async function POST(request: Request) {
   try {
-    const { headline, sourceText } = await request.json();
+    const {
+      headline,
+      sourceText,
+      category = "General",
+      imageUrl = "",
+      published = true,
+    } = await request.json();
 
-    if (!headline || !sourceText) {
+    if (!headline?.trim() || !sourceText?.trim()) {
       return NextResponse.json(
         {
           error: "Take da bayanan labari suna da muhimmanci.",
@@ -87,18 +93,15 @@ ${sourceText}
       result.choices?.[0]?.message?.content ||
       "Ba a samu labari ba.";
 
-    // Cire Markdown idan AI ya saka shi duk da umarni
     article = article
       .replace(/\*\*/g, "")
       .replace(/^#+\s*/gm, "")
       .trim();
 
-    // Idan AI ya maimaita taken a farkon content,
-    // a cire shi domin kada title ya bayyana sau biyu.
-    if (article.toLowerCase().startsWith(headline.toLowerCase())) {
-      article = article
-        .slice(headline.length)
-        .trim();
+    if (
+      article.toLowerCase().startsWith(headline.toLowerCase())
+    ) {
+      article = article.slice(headline.length).trim();
     }
 
     const { data, error } = await supabase
@@ -108,6 +111,9 @@ ${sourceText}
           title: headline,
           content: article,
           source: sourceText,
+          category,
+          image_url: imageUrl,
+          published,
         },
       ])
       .select();
@@ -133,6 +139,7 @@ ${sourceText}
     return NextResponse.json({
       success: true,
       article,
+      news: data?.[0] || null,
     });
   } catch (error) {
     console.error(error);
