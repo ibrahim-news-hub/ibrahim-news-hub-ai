@@ -26,11 +26,17 @@ export default function CreateNews() {
 
       const data = await res.json();
 
-      setNews(
-        data.article ||
-          data.error ||
-          "Ba a samu labari ba."
-      );
+      if (!res.ok || data.success === false) {
+        setNews(
+          data.details
+            ? `${data.error}\n\nDetails: ${data.details}\nCode: ${
+                data.code || "N/A"
+              }`
+            : data.error || "An samu kuskure."
+        );
+      } else {
+        setNews(data.article || "Ba a samu labari ba.");
+      }
     } catch (error) {
       console.error(error);
       setNews("An samu matsala wajen haɗawa da server.");
