@@ -87,13 +87,19 @@ ${sourceText}
     console.log("INSERT ERROR:", error);
 
     if (error) {
-      return NextResponse.json({
-        success: true,
-        article,
-        warning: "An samar da labarin amma ba a ajiye shi a database ba.",
-      });
-    }
+  console.error("SUPABASE INSERT ERROR:", error);
 
+  return NextResponse.json(
+    {
+      success: false,
+      article,
+      error: "Supabase insert failed",
+      details: error.message,
+      code: error.code,
+    },
+    { status: 500 }
+  );
+}
     return NextResponse.json({
       success: true,
       article,
