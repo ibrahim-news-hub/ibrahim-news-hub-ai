@@ -7,65 +7,49 @@ export default function CreateNews() {
   const [headline, setHeadline] = useState("");
   const [sourceText, setSourceText] = useState("");
   const [category, setCategory] = useState("General");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState("");
   const [published, setPublished] = useState(true);
+
   const [news, setNews] = useState("");
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  async function uploadImage(file: File) {
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      setNews("Da fatan za a zaɓi hoto kawai.");
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      setNews("Hoton ya yi girma. Zaɓi hoto da bai wuce 5MB ba.");
-      return;
-    }
+  async function uploadImage() {
+    if (!imageFile) return "";
 
     setUploading(true);
-    setNews("");
 
     try {
-      const extension = file.name.split(".").pop() || "jpg";
-
+      const fileExt = imageFile.name.split(".").pop();
       const fileName = `${Date.now()}-${Math.random()
         .toString(36)
-        .substring(2)}.${extension}`;
+        .substring(2)}.${fileExt}`;
 
-      const filePath = `news/${fileName}`;
+      const filePath = fileName;
 
       const { error: uploadError } = await supabase.storage
         .from("news-images")
-        .upload(filePath, file, {
+        .upload(filePath, imageFile, {
           cacheControl: "3600",
           upsert: false,
         });
 
       if (uploadError) {
-        console.error("UPLOAD ERROR:", uploadError);
+        console.error(uploadError);
         setNews(`An kasa upload hoto: ${uploadError.message}`);
-        return;
+        return "";
       }
 
       const { data } = supabase.storage
         .from("news-images")
         .getPublicUrl(filePath);
 
-      if (!data?.publicUrl) {
-        setNews("An kasa samun URL na hoton.");
-        return;
-      }
-
-      setImageUrl(data.publicUrl);
-      setNews("✅ An upload hoto successfully.");
-
+      return data.publicUrl;
     } catch (error) {
       console.error(error);
       setNews("An samu matsala wajen upload hoto.");
+      return "";
     } finally {
       setUploading(false);
     }
@@ -81,6 +65,19 @@ export default function CreateNews() {
     setNews("");
 
     try {
+      let finalImageUrl = imageUrl;
+
+      if (imageFile) {
+        finalImageUrl = await uploadImage();
+
+        if (!finalImageUrl) {
+          setLoading(false);
+          return;
+        }
+
+        setImageUrl(finalImageUrl);
+      }
+
       const res = await fetch("/api/write-news", {
         method: "POST",
         headers: {
@@ -90,7 +87,7 @@ export default function CreateNews() {
           headline,
           sourceText,
           category,
-          imageUrl,
+          imageUrl: finalImageUrl,
           published,
         }),
       });
@@ -168,82 +165,38 @@ export default function CreateNews() {
         <option value="Viral">🔥 Viral</option>
       </select>
 
-      <div
+      <label
         style={{
-          border: "1px solid #ddd",
-          borderRadius: "8px",
-          padding: "15px",
-          marginBottom: "15px",
+          display: "block",
+          marginBottom: "8px",
+          fontWeight: "bold",
         }}
       >
-        <label
-          style={{
-            display: "block",
-            fontWeight: "bold",
-            marginBottom: "10px",
-          }}
-        >
-          🖼️ Zaɓi Hoto
-        </label>
-
-        <input
-          type="file"
-          accept="image/*"
-          disabled={uploading}
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-
-            if (file) {
-              uploadImage(file);
-            }
-          }}
-          style={{
-            width: "100%",
-            fontSize: "16px",
-          }}
-        />
-
-        {uploading && (
-          <p style={{ color: "#2563eb", marginTop: "10px" }}>
-            ⏳ Ana upload hoto...
-          </p>
-        )}
-
-        {imageUrl && (
-          <div style={{ marginTop: "15px" }}>
-            <p style={{ color: "green" }}>
-              ✅ An shirya hoton.
-            </p>
-
-            <img
-              src={imageUrl}
-              alt="News image preview"
-              style={{
-                width: "100%",
-                maxHeight: "350px",
-                objectFit: "cover",
-                borderRadius: "8px",
-              }}
-            />
-          </div>
-        )}
-      </div>
+        🖼️ Zaɓi hoto
+      </label>
 
       <input
-        type="text"
-        placeholder="Ko liƙa Image URL..."
-        value={imageUrl}
-        onChange={(e) => setImageUrl(e.target.value)}
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files?.[0] || null;
+          setImageFile(file);
+        }}
         style={{
           width: "100%",
-          padding: "14px",
-          fontSize: "16px",
+          padding: "12px",
           marginBottom: "15px",
           boxSizing: "border-box",
           border: "1px solid #ddd",
           borderRadius: "8px",
         }}
       />
+
+      {imageFile && (
+        <p style={{ color: "#555", marginBottom: "15px" }}>
+          📷 {imageFile.name}
+        </p>
+      )}
 
       <textarea
         placeholder="Liƙa cikakken bayanin labari a nan..."
@@ -295,10 +248,10 @@ export default function CreateNews() {
             loading || uploading ? "not-allowed" : "pointer",
         }}
       >
-        {loading
-          ? "Generating..."
-          : uploading
+        {uploading
           ? "Uploading Image..."
+          : loading
+          ? "Generating..."
           : "Generate News"}
       </button>
 
@@ -327,4 +280,3 @@ export default function CreateNews() {
     </main>
   );
 }
-
