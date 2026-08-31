@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function CreateNews() {
   const [headline, setHeadline] = useState("");
@@ -10,6 +11,65 @@ export default function CreateNews() {
   const [published, setPublished] = useState(true);
   const [news, setNews] = useState("");
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  async function uploadImage(file: File) {
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setNews("Da fatan za a zaɓi hoto kawai.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setNews("Hoton ya yi girma. Zaɓi hoto da bai wuce 5MB ba.");
+      return;
+    }
+
+    setUploading(true);
+    setNews("");
+
+    try {
+      const extension = file.name.split(".").pop() || "jpg";
+
+      const fileName = `${Date.now()}-${Math.random()
+        .toString(36)
+        .substring(2)}.${extension}`;
+
+      const filePath = `news/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("news-images")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (uploadError) {
+        console.error("UPLOAD ERROR:", uploadError);
+        setNews(`An kasa upload hoto: ${uploadError.message}`);
+        return;
+      }
+
+      const { data } = supabase.storage
+        .from("news-images")
+        .getPublicUrl(filePath);
+
+      if (!data?.publicUrl) {
+        setNews("An kasa samun URL na hoton.");
+        return;
+      }
+
+      setImageUrl(data.publicUrl);
+      setNews("✅ An upload hoto successfully.");
+
+    } catch (error) {
+      console.error(error);
+      setNews("An samu matsala wajen upload hoto.");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function generateNews() {
     if (!headline.trim() || !sourceText.trim()) {
@@ -108,9 +168,70 @@ export default function CreateNews() {
         <option value="Viral">🔥 Viral</option>
       </select>
 
+      <div
+        style={{
+          border: "1px solid #ddd",
+          borderRadius: "8px",
+          padding: "15px",
+          marginBottom: "15px",
+        }}
+      >
+        <label
+          style={{
+            display: "block",
+            fontWeight: "bold",
+            marginBottom: "10px",
+          }}
+        >
+          🖼️ Zaɓi Hoto
+        </label>
+
+        <input
+          type="file"
+          accept="image/*"
+          disabled={uploading}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+
+            if (file) {
+              uploadImage(file);
+            }
+          }}
+          style={{
+            width: "100%",
+            fontSize: "16px",
+          }}
+        />
+
+        {uploading && (
+          <p style={{ color: "#2563eb", marginTop: "10px" }}>
+            ⏳ Ana upload hoto...
+          </p>
+        )}
+
+        {imageUrl && (
+          <div style={{ marginTop: "15px" }}>
+            <p style={{ color: "green" }}>
+              ✅ An shirya hoton.
+            </p>
+
+            <img
+              src={imageUrl}
+              alt="News image preview"
+              style={{
+                width: "100%",
+                maxHeight: "350px",
+                objectFit: "cover",
+                borderRadius: "8px",
+              }}
+            />
+          </div>
+        )}
+      </div>
+
       <input
         type="text"
-        placeholder="Image URL — misali https://..."
+        placeholder="Ko liƙa Image URL..."
         value={imageUrl}
         onChange={(e) => setImageUrl(e.target.value)}
         style={{
@@ -160,19 +281,25 @@ export default function CreateNews() {
 
       <button
         onClick={generateNews}
-        disabled={loading}
+        disabled={loading || uploading}
         style={{
           width: "100%",
           padding: "14px",
-          background: loading ? "#94a3b8" : "#2563eb",
+          background:
+            loading || uploading ? "#94a3b8" : "#2563eb",
           color: "#fff",
           border: "none",
           borderRadius: "8px",
           fontSize: "18px",
-          cursor: loading ? "not-allowed" : "pointer",
+          cursor:
+            loading || uploading ? "not-allowed" : "pointer",
         }}
       >
-        {loading ? "Generating..." : "Generate News"}
+        {loading
+          ? "Generating..."
+          : uploading
+          ? "Uploading Image..."
+          : "Generate News"}
       </button>
 
       {news && (
@@ -200,3 +327,4 @@ export default function CreateNews() {
     </main>
   );
 }
+
