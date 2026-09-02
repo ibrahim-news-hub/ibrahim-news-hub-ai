@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     }
 
     const prompt = `
-Kai ƙwararren ɗan jarida ne na gidan Ibrahim News Hub AI.
+Kai ƙwararren ɗan jarida ne na gidan IBRAHIM SANI NEWS.
 
 Aiki:
 Rubuta cikakken labari cikin Hausa mai sauƙin karantawa.

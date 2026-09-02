@@ -106,7 +106,7 @@ export default async function NewsPage({ searchParams }: Props) {
               margin: 0,
             }}
           >
-            Sabbin labarai daga Ibrahim News Hub AI
+            Sabbin labarai daga IBRAHIM SANI NEWS
           </p>
 
           <div

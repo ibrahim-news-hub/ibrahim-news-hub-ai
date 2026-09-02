@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ibrahim News Hub AI",
+  title: "IBRAHIM SANI NEWS",
   description:
-    "Latest news from Nigeria, Africa and the world — Ibrahim News Hub AI.",
+    "Latest news from Nigeria, Africa and the world — IBRAHIM SANI NEWS.",
 };
 
 export default function RootLayout({

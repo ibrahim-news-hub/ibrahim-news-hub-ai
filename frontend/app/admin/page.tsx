@@ -259,7 +259,7 @@ export default function AdminPage() {
               marginBottom: 0,
             }}
           >
-            Ibrahim News Hub AI
+            IBRAHIM SANI NEWS
           </p>
         </div>
 

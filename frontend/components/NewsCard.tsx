@@ -56,12 +56,12 @@ function formatViews(views?: number | null) {
 }
 
 function getSource(source?: string | null) {
-  if (!source) return "Ibrahim News Hub AI";
+  if (!source) return "IBRAHIM SANI NEWS";
 
   return source
     .replace(/^https?:\/\/[^/]+/i, "")
     .split(" — ")[0]
-    .trim() || "Ibrahim News Hub AI";
+    .trim() || "IBRAHIM SANI NEWS";
 }
 
 export default function NewsCard({
@@ -105,7 +105,7 @@ export default function NewsCard({
           ) : (
             <div className="news-card-placeholder">
               <span>📰</span>
-              <strong>Ibrahim News Hub AI</strong>
+              <strong>IBRAHIM SANI NEWS</strong>
             </div>
           )}
 

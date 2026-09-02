@@ -124,7 +124,7 @@ export default function CreateNews() {
       <h1>📰 Create News</h1>
 
       <p style={{ color: "#666", marginBottom: "25px" }}>
-        Ƙirƙiri sabon labari ta amfani da Ibrahim News Hub AI.
+        Ƙirƙiri sabon labari ta amfani da IBRAHIM SANI NEWS.
       </p>
 
       <input

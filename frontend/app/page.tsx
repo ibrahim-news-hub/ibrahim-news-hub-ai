@@ -49,7 +49,7 @@ export default async function Home({
   const latest = news.slice(1);
 
   const t = {
-    brand: "Ibrahim News Hub AI",
+    brand: "IBRAHIM SANI NEWS",
 
     tagline: hausa
       ? "Gaskiya • Sauri • Sahihanci"
@@ -223,8 +223,8 @@ export default async function Home({
           >
             {featured?.title ||
               (hausa
-                ? "Ku kasance tare da Ibrahim News Hub AI domin sabbin labarai."
-                : "Stay with Ibrahim News Hub AI for the latest news.")}
+                ? "Ku kasance tare da IBRAHIM SANI NEWS domin sabbin labarai."
+                : "Stay with IBRAHIM SANI NEWS for the latest news.")}
           </div>
         </div>
       </div>
@@ -448,7 +448,7 @@ export default async function Home({
               fontWeight: 900,
             }}
           >
-            📰 Ibrahim News Hub AI
+            📰 IBRAHIM SANI NEWS
           </div>
 
           <p
@@ -488,7 +488,7 @@ export default async function Home({
               marginTop: 25,
             }}
           >
-            © {new Date().getFullYear()} Ibrahim News Hub AI.
+            © {new Date().getFullYear()} IBRAHIM SANI NEWS.
             All rights reserved.
           </p>
         </div>

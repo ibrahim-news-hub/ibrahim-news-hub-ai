@@ -335,7 +335,7 @@ async function rewriteNewsWithAI(
   }
 
   const prompt = `
-Kai ƙwararren editan labarai ne na Ibrahim News Hub AI.
+Kai ƙwararren editan labarai ne na IBRAHIM SANI NEWS.
 
 Ka sake rubuta labarin da ke ƙasa cikin Hausa mai kyau,
 bayyananniya kuma mai sauƙin fahimta.

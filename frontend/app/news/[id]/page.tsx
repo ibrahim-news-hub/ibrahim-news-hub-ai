@@ -120,7 +120,7 @@ export default async function NewsArticlePage({
                 fontWeight: "900",
               }}
             >
-              📰 Ibrahim News Hub AI
+              📰 IBRAHIM SANI NEWS
             </div>
 
             <div
@@ -227,7 +227,7 @@ export default async function NewsArticlePage({
           </span>
 
           <span style={{ fontSize: "14px" }}>
-            Ibrahim News Hub AI
+            IBRAHIM SANI NEWS
           </span>
         </div>
       </div>
@@ -508,7 +508,7 @@ export default async function NewsArticlePage({
             fontWeight: "900",
           }}
         >
-          📰 Ibrahim News Hub AI
+          📰 IBRAHIM SANI NEWS
         </div>
 
         <p
@@ -528,7 +528,7 @@ export default async function NewsArticlePage({
           }}
         >
           © {new Date().getFullYear()}{" "}
-          Ibrahim News Hub AI
+          IBRAHIM SANI NEWS
         </p>
       </footer>
     </main>
