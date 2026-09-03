@@ -26,13 +26,39 @@ const categories = [
   { name: "Wasanni", value: "Sports", icon: "⚽" },
 ];
 
+const languages = [
+  ["ha", "Hausa 🇳🇬"],
+  ["en", "English 🇬🇧"],
+  ["ar", "العربية 🇸🇦"],
+  ["kr", "Kanuri 🇳🇬"],
+  ["yo", "Yorùbá 🇳🇬"],
+  ["ig", "Igbo 🇳🇬"],
+  ["fr", "Français 🇫🇷"],
+  ["es", "Español 🇪🇸"],
+  ["pt", "Português 🇵🇹"],
+  ["pt-br", "Português do Brasil 🇧🇷"],
+  ["sw", "Kiswahili 🇹🇿"],
+  ["mnk", "Mandinka"],
+  ["ff", "Fulfulde"],
+  ["ro", "Română 🇷🇴"],
+  ["ru", "Русский 🇷🇺"],
+  ["uk", "Українська 🇺🇦"],
+  ["vi", "Tiếng Việt 🇻🇳"],
+  ["km", "ភាសាខ្មែរ"],
+  ["zh", "简体中文 🇨🇳"],
+  ["zh-tw", "繁體中文 🇹🇼"],
+  ["hy", "Հայերեն"],
+  ["fa", "فارسی"],
+];
+
 export default async function Home({
   searchParams,
 }: {
   searchParams: Promise<{ lang?: string }>;
 }) {
   const params = await searchParams;
-  const hausa = params?.lang === "ha";
+  const lang = params?.lang || "ha";
+  const hausa = lang === "ha";
 
   const { data, error } = await supabase
     .from("news")
@@ -57,29 +83,15 @@ export default async function Home({
 
     home: hausa ? "Gida" : "Home",
 
-    allNews: hausa
-      ? "Dukkan Labarai"
-      : "All News",
+    allNews: hausa ? "Dukkan Labarai" : "All News",
 
-    search: hausa
-      ? "Nemo Labari"
-      : "Search News",
+    search: hausa ? "Nemo Labari" : "Search News",
 
-    breaking: hausa
-      ? "LABARI MAI ZAFI"
-      : "BREAKING NEWS",
+    breaking: hausa ? "LABARI MAI ZAFI" : "BREAKING NEWS",
 
-    featured: hausa
-      ? "Babban Labari"
-      : "Top Story",
+    featured: hausa ? "Babban Labari" : "Top Story",
 
-    latest: hausa
-      ? "Sabbin Labarai"
-      : "Latest News",
-
-    categories: hausa
-      ? "Rukunin Labarai"
-      : "Categories",
+    latest: hausa ? "Sabbin Labarai" : "Latest News",
 
     noNews: hausa
       ? "Babu labarai a halin yanzu."
@@ -88,11 +100,12 @@ export default async function Home({
     error: hausa
       ? "An samu matsala wajen ɗauko labarai."
       : "There was a problem loading the news.",
+
+    language: hausa ? "Harshe" : "Language",
   };
 
   return (
     <main className="site-main">
-
       {/* =========================
           TOP HEADER
       ========================= */}
@@ -110,7 +123,7 @@ export default async function Home({
           style={{
             maxWidth: 1200,
             margin: "0 auto",
-            padding: "16px 20px",
+            padding: "12px 20px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -118,6 +131,7 @@ export default async function Home({
             flexWrap: "wrap",
           }}
         >
+          {/* LOGO */}
           <Link
             href="/"
             style={{
@@ -125,27 +139,21 @@ export default async function Home({
               textDecoration: "none",
               display: "flex",
               alignItems: "center",
-              gap: 10,
             }}
           >
-            <span style={{ fontSize: 32 }}>📰</span>
-
-            <span>
-              <strong
-                style={{
-                  fontSize: 22,
-                  display: "block",
-                }}
-              >
-                {t.brand}
-              </strong>
-
-              <small style={{ color: "#cbd5e1" }}>
-                {t.tagline}
-              </small>
-            </span>
+            <img
+              src="/ibrahim-sani-news-logo.png"
+              alt="IBRAHIM SANI NEWS"
+              style={{
+                width: 120,
+                height: 78,
+                objectFit: "contain",
+                display: "block",
+              }}
+            />
           </Link>
 
+          {/* NAVIGATION */}
           <nav
             style={{
               display: "flex",
@@ -166,16 +174,64 @@ export default async function Home({
               ⚙️ Admin
             </Link>
 
-            <Link
-              href={hausa ? "/" : "/?lang=ha"}
-              style={{
-                ...navStyle,
-                background: "#dc1e2b",
-                borderRadius: 7,
-              }}
-            >
-              {hausa ? "English" : "Hausa"}
-            </Link>
+            {/* LANGUAGE SELECTOR */}
+            <details style={{ position: "relative" }}>
+              <summary
+                style={{
+                  listStyle: "none",
+                  cursor: "pointer",
+                  background: "#dc1e2b",
+                  color: "#fff",
+                  padding: "10px 14px",
+                  borderRadius: 7,
+                  fontWeight: 700,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                🌐 {t.language} ▾
+              </summary>
+
+              <div
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  top: "calc(100% + 8px)",
+                  width: 320,
+                  maxHeight: 420,
+                  overflowY: "auto",
+                  background: "#fff",
+                  color: "#111827",
+                  borderRadius: 10,
+                  padding: 12,
+                  boxShadow: "0 10px 30px rgba(0,0,0,.25)",
+                  zIndex: 100,
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 4,
+                }}
+              >
+                {languages.map(([code, name]) => (
+                  <Link
+                    key={code}
+                    href={`/?lang=${code}`}
+                    style={{
+                      textDecoration: "none",
+                      color: "#111827",
+                      padding: "10px 8px",
+                      borderRadius: 6,
+                      fontSize: 14,
+                      fontWeight: code === lang ? 800 : 500,
+                      direction:
+                        code === "ar" || code === "fa"
+                          ? "rtl"
+                          : "ltr",
+                    }}
+                  >
+                    {name}
+                  </Link>
+                ))}
+              </div>
+            </details>
           </nav>
         </div>
       </header>
@@ -292,9 +348,7 @@ export default async function Home({
           {categories.map((cat) => (
             <Link
               key={cat.value}
-              href={`/news?category=${encodeURIComponent(
-                cat.value
-              )}`}
+              href={`/news?category=${encodeURIComponent(cat.value)}`}
               className="category-pill"
             >
               {cat.icon} {cat.name}
@@ -313,7 +367,6 @@ export default async function Home({
           padding: "10px 20px 50px",
         }}
       >
-
         {/* SECTION TITLE */}
         <div
           style={{
@@ -334,23 +387,14 @@ export default async function Home({
             🔥 {t.featured}
           </h2>
 
-          <Link
-            href="/news"
-            className="section-link"
-          >
+          <Link href="/news" className="section-link">
             {t.allNews} →
           </Link>
         </div>
 
-        {/* =========================
-            FEATURED STORY
-        ========================= */}
+        {/* FEATURED STORY */}
         {featured ? (
-          <div
-            style={{
-              marginBottom: 35,
-            }}
-          >
+          <div style={{ marginBottom: 35 }}>
             <NewsCard
               item={featured}
               lang={hausa ? "ha" : "en"}
@@ -363,9 +407,7 @@ export default async function Home({
           </div>
         )}
 
-        {/* =========================
-            LATEST NEWS
-        ========================= */}
+        {/* LATEST NEWS */}
         {latest.length > 0 && (
           <>
             <div
@@ -488,8 +530,8 @@ export default async function Home({
               marginTop: 25,
             }}
           >
-            © {new Date().getFullYear()} IBRAHIM SANI NEWS.
-            All rights reserved.
+            © {new Date().getFullYear()} IBRAHIM SANI NEWS. All rights
+            reserved.
           </p>
         </div>
       </footer>
