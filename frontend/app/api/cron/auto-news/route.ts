@@ -44,6 +44,18 @@ function normalizeTitle(value: string) {
     .trim();
 }
 
+function normalizeUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    parsed.hash = "";
+    parsed.search = "";
+    return parsed.toString().replace(/\/$/, "");
+  } catch {
+    return url.trim().toLowerCase().replace(/\/$/, "");
+  }
+}
+
+
 function absoluteUrl(value: string, baseUrl: string) {
   if (!value) return "";
 
@@ -546,7 +558,7 @@ export async function GET(request: Request) {
       error: recentError,
     } = await supabase
       .from("news")
-      .select("id,title")
+      .select("id,title,source,source_name,source_url")
       .order("created_at", {
         ascending: false,
       })
@@ -562,12 +574,22 @@ export async function GET(request: Request) {
       const normalizedTitle =
         normalizeTitle(item.title);
 
-      const duplicate =
-        (recentNews || []).some(
-          (news) =>
-            normalizeTitle(news.title) ===
-            normalizedTitle
+      const normalizedUrl = normalizeUrl(item.link);
+
+    const duplicate =
+      (recentNews || []).some((news) => {
+        const oldUrl = news.source_url
+          ? normalizeUrl(news.source_url)
+          : (() => {
+              const parts = String(news.source || "").split(" — ");
+              return parts.length > 1 ? normalizeUrl(parts.slice(1).join(" — ")) : "";
+            })();
+
+        return (
+          (oldUrl && oldUrl === normalizedUrl) ||
+          normalizeTitle(news.title) === normalizedTitle
         );
+      });
 
       if (duplicate) {
         continue;
@@ -608,6 +630,8 @@ export async function GET(request: Request) {
             content: rewritten.article,
             source:
               `${item.source} — ${item.link}`,
+            source_name: item.source,
+            source_url: item.link,
             category,
             image_url: imageUrl || null,
             video_url: videoUrl || null,
