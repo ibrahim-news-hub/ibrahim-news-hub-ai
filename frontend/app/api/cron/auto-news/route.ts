@@ -472,16 +472,13 @@ async function getFeedItems(): Promise<NewsItem[]> {
 | AI NEWS WRITER
 |--------------------------------------------------------------------------
 */
-
 async function rewriteNewsWithAI(
   item: NewsItem
 ): Promise<RewrittenNews> {
   const apiKey = process.env.GROQ_API_KEY;
 
   if (!apiKey) {
-    throw new Error(
-      "GROQ_API_KEY is missing."
-    );
+    throw new Error("GROQ_API_KEY is missing.");
   }
 
   const category = getCategory(item.title);
@@ -507,45 +504,31 @@ ${item.description}
 MUHIMMAN ƘA'IDOJI:
 
 1. Kada ka ƙirƙiri wani sabon bayani.
-
 2. Kada ka ƙara sunaye, lambobi, wurare ko bayanan da source bai bayar ba.
-
 3. Kada ka canza ma'anar rahoton.
-
 4. Idan bayanin zargi ne, ka rubuta shi a matsayin zargi.
-
 5. Idan rahoton bai tabbatar da wani abu ba, kada ka gabatar da shi a matsayin tabbataccen abu.
-
 6. Kada ka yi sensationalism.
-
 7. Kada ka yi amfani da kalmomin da za su iya yaudarar mai karatu.
-
 8. Taken ya kasance Hausa.
-
 9. Taken ya kasance gajere, ƙarfi kuma ƙwararre.
-
 10. Labarin ya kasance sakin layi 4 zuwa 6.
-
 11. Kada ka kwafi jimlolin source kai tsaye.
-
 12. Kada ka ambaci AI.
-
 13. Kada ka yi Markdown.
-
-14. Idan bayanin source ya yi kaɗan, kada ka ƙirƙiri ƙarin bayani domin cike gibin.
-
+14. Idan bayanin source ya yi kaɗan, kada ka ƙirƙiri ƙarin bayani.
 15. Ka yi amfani da "Rahotanni sun ce" ko makamancin haka idan source bai tabbatar da cikakken bayani ba.
-
 16. Kada ka rubuta ra'ayi naka.
-
 17. Ka kula sosai da sunayen ƙasashe, shugabanni, ƙungiyoyi da wurare.
 
-Ka dawo da JSON kawai:
+Ka dawo da JSON kawai mai wannan tsarin:
 
 {
   "title": "Taken Hausa",
   "article": "Labarin Hausa"
 }
+
+Kada ka saka markdown fences kamar \`\`\`json.
 `;
 
   const response = await fetch(
@@ -565,6 +548,10 @@ Ka dawo da JSON kawai:
           },
         ],
         temperature: 0.2,
+        response_format: {
+          type: "json_object",
+        },
+        max_completion_tokens: 1200,
       }),
     }
   );
@@ -573,29 +560,33 @@ Ka dawo da JSON kawai:
     const errorText = await response.text();
 
     throw new Error(
-      `Groq API error: ${errorText}`
+      `Groq API error (${response.status}): ${errorText}`
     );
   }
 
   const result = await response.json();
 
+  const message = result?.choices?.[0]?.message;
   const output =
-    result.choices?.[0]?.message?.content?.trim() ||
-    "";
+    typeof message?.content === "string"
+      ? message.content.trim()
+      : "";
 
   if (!output) {
+    console.error(
+      "GROQ EMPTY RESPONSE:",
+      JSON.stringify(result)
+    );
+
     throw new Error(
-      "Groq bai dawo da bayani ba."
+      "Groq bai dawo da wani bayani ba."
     );
   }
 
   let jsonText = output;
 
-  const firstBrace =
-    output.indexOf("{");
-
-  const lastBrace =
-    output.lastIndexOf("}");
+  const firstBrace = output.indexOf("{");
+  const lastBrace = output.lastIndexOf("}");
 
   if (
     firstBrace !== -1 &&
@@ -617,7 +608,7 @@ Ka dawo da JSON kawai:
     parsed = JSON.parse(jsonText);
   } catch {
     console.error(
-      "AI RAW OUTPUT:",
+      "GROQ INVALID JSON:",
       output
     );
 
@@ -630,6 +621,11 @@ Ka dawo da JSON kawai:
     !parsed.title?.trim() ||
     !parsed.article?.trim()
   ) {
+    console.error(
+      "GROQ MISSING TITLE OR ARTICLE:",
+      JSON.stringify(parsed)
+    );
+
     throw new Error(
       "AI bai dawo da title ko article ba."
     );
