@@ -1,0 +1,605 @@
+export type LanguageCode =
+  | "ha"
+  | "en"
+  | "ar"
+  | "kr"
+  | "yo"
+  | "ig"
+  | "fr"
+  | "es"
+  | "pt"
+  | "pt-br"
+  | "sw"
+  | "mnk"
+  | "ff"
+  | "ro"
+  | "ru"
+  | "uk"
+  | "vi"
+  | "km"
+  | "zh"
+  | "zh-tw"
+  | "hy"
+  | "fa";
+
+export const translations: Record<
+  LanguageCode,
+  {
+    brand: string;
+    tagline: string;
+    home: string;
+    allNews: string;
+    search: string;
+    breaking: string;
+    featured: string;
+    latest: string;
+    noNews: string;
+    error: string;
+    language: string;
+    views: string;
+    source: string;
+    admin: string;
+    categories: {
+      Nigeria: string;
+      World: string;
+      Politics: string;
+      Business: string;
+      Technology: string;
+      Sports: string;
+    };
+  }
+> = {
+  ha: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "Gaskiya • Sauri • Sahihanci",
+    home: "Gida",
+    allNews: "Dukkan Labarai",
+    search: "Nemo Labari",
+    breaking: "LABARI MAI ZAFI",
+    featured: "Babban Labari",
+    latest: "Sabbin Labarai",
+    noNews: "Babu labarai a halin yanzu.",
+    error: "An samu matsala wajen ɗauko labarai.",
+    language: "Harshe",
+    views: "Karatu",
+    source: "Bayanan Asali",
+    admin: "Admin",
+    categories: {
+      Nigeria: "Najeriya",
+      World: "Duniya",
+      Politics: "Siyasa",
+      Business: "Kasuwanci",
+      Technology: "Fasaha",
+      Sports: "Wasanni",
+    },
+  },
+
+  en: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "Truth • Speed • Credibility",
+    home: "Home",
+    allNews: "All News",
+    search: "Search News",
+    breaking: "BREAKING NEWS",
+    featured: "Top Story",
+    latest: "Latest News",
+    noNews: "No news available at the moment.",
+    error: "There was a problem loading the news.",
+    language: "Language",
+    views: "Views",
+    source: "Source",
+    admin: "Admin",
+    categories: {
+      Nigeria: "Nigeria",
+      World: "World",
+      Politics: "Politics",
+      Business: "Business",
+      Technology: "Technology",
+      Sports: "Sports",
+    },
+  },
+
+  ar: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "الحقيقة • السرعة • المصداقية",
+    home: "الرئيسية",
+    allNews: "كل الأخبار",
+    search: "البحث عن الأخبار",
+    breaking: "خبر عاجل",
+    featured: "أهم الأخبار",
+    latest: "آخر الأخبار",
+    noNews: "لا توجد أخبار في الوقت الحالي.",
+    error: "حدثت مشكلة أثناء تحميل الأخبار.",
+    language: "اللغة",
+    views: "المشاهدات",
+    source: "المصدر",
+    admin: "الإدارة",
+    categories: {
+      Nigeria: "نيجيريا",
+      World: "العالم",
+      Politics: "السياسة",
+      Business: "الأعمال",
+      Technology: "التكنولوجيا",
+      Sports: "الرياضة",
+    },
+  },
+
+  yo: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "Otitọ • Iyara • Igbẹkẹle",
+    home: "Ile",
+    allNews: "Gbogbo Awọn Iroyin",
+    search: "Wa Iroyin",
+    breaking: "IROYIN PAJAWIRI",
+    featured: "Iroyin Pataki",
+    latest: "Awọn Iroyin Titun",
+    noNews: "Ko si iroyin lọwọlọwọ.",
+    error: "Iṣoro kan wa nigba ikojọpọ awọn iroyin.",
+    language: "Ede",
+    views: "Awọn kika",
+    source: "Orísun",
+    admin: "Alakoso",
+    categories: {
+      Nigeria: "Naijiria",
+      World: "Agbaye",
+      Politics: "Iselu",
+      Business: "Iṣowo",
+      Technology: "Imọ-ẹrọ",
+      Sports: "Idaraya",
+    },
+  },
+
+  ig: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "Eziokwu • Ọsọ • Ntụkwasị obi",
+    home: "Ụlọ",
+    allNews: "Akụkọ Niile",
+    search: "Chọọ Akụkọ",
+    breaking: "AKỤKỌ DỊ MKPA",
+    featured: "Akụkọ Pụrụ Iche",
+    latest: "Akụkọ Ọhụrụ",
+    noNews: "Enweghị akụkọ ugbu a.",
+    error: "Nsogbu mere mgbe a na-ebudata akụkọ.",
+    language: "Asụsụ",
+    views: "Nlele",
+    source: "Isi Iyi",
+    admin: "Onye nchịkwa",
+    categories: {
+      Nigeria: "Naịjirịa",
+      World: "Ụwa",
+      Politics: "Ọchịchị",
+      Business: "Azụmahịa",
+      Technology: "Teknụzụ",
+      Sports: "Egwuregwu",
+    },
+  },
+
+  fr: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "Vérité • Rapidité • Crédibilité",
+    home: "Accueil",
+    allNews: "Toutes les actualités",
+    search: "Rechercher",
+    breaking: "DERNIÈRE MINUTE",
+    featured: "À la une",
+    latest: "Dernières actualités",
+    noNews: "Aucune actualité disponible.",
+    error: "Un problème est survenu lors du chargement des actualités.",
+    language: "Langue",
+    views: "Vues",
+    source: "Source",
+    admin: "Administration",
+    categories: {
+      Nigeria: "Nigeria",
+      World: "Monde",
+      Politics: "Politique",
+      Business: "Commerce",
+      Technology: "Technologie",
+      Sports: "Sports",
+    },
+  },
+
+  es: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "Verdad • Rapidez • Credibilidad",
+    home: "Inicio",
+    allNews: "Todas las noticias",
+    search: "Buscar noticias",
+    breaking: "ÚLTIMA HORA",
+    featured: "Noticia destacada",
+    latest: "Últimas noticias",
+    noNews: "No hay noticias disponibles.",
+    error: "Hubo un problema al cargar las noticias.",
+    language: "Idioma",
+    views: "Vistas",
+    source: "Fuente",
+    admin: "Administración",
+    categories: {
+      Nigeria: "Nigeria",
+      World: "Mundo",
+      Politics: "Política",
+      Business: "Negocios",
+      Technology: "Tecnología",
+      Sports: "Deportes",
+    },
+  },
+
+  pt: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "Verdade • Rapidez • Credibilidade",
+    home: "Início",
+    allNews: "Todas as notícias",
+    search: "Pesquisar notícias",
+    breaking: "ÚLTIMA HORA",
+    featured: "Notícia principal",
+    latest: "Últimas notícias",
+    noNews: "Não há notícias disponíveis.",
+    error: "Ocorreu um problema ao carregar as notícias.",
+    language: "Idioma",
+    views: "Visualizações",
+    source: "Fonte",
+    admin: "Administração",
+    categories: {
+      Nigeria: "Nigéria",
+      World: "Mundo",
+      Politics: "Política",
+      Business: "Negócios",
+      Technology: "Tecnologia",
+      Sports: "Desporto",
+    },
+  },
+
+  "pt-br": {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "Verdade • Rapidez • Credibilidade",
+    home: "Início",
+    allNews: "Todas as notícias",
+    search: "Pesquisar notícias",
+    breaking: "URGENTE",
+    featured: "Destaque",
+    latest: "Últimas notícias",
+    noNews: "Nenhuma notícia disponível.",
+    error: "Ocorreu um problema ao carregar as notícias.",
+    language: "Idioma",
+    views: "Visualizações",
+    source: "Fonte",
+    admin: "Admin",
+    categories: {
+      Nigeria: "Nigéria",
+      World: "Mundo",
+      Politics: "Política",
+      Business: "Negócios",
+      Technology: "Tecnologia",
+      Sports: "Esportes",
+    },
+  },
+
+  sw: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "Ukweli • Kasi • Uaminifu",
+    home: "Nyumbani",
+    allNews: "Habari Zote",
+    search: "Tafuta Habari",
+    breaking: "HABARI ZA HARAKA",
+    featured: "Habari Kuu",
+    latest: "Habari za Hivi Karibuni",
+    noNews: "Hakuna habari kwa sasa.",
+    error: "Kuna tatizo wakati wa kupakia habari.",
+    language: "Lugha",
+    views: "Mionekano",
+    source: "Chanzo",
+    admin: "Msimamizi",
+    categories: {
+      Nigeria: "Nigeria",
+      World: "Dunia",
+      Politics: "Siasa",
+      Business: "Biashara",
+      Technology: "Teknolojia",
+      Sports: "Michezo",
+    },
+  },
+
+  ru: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "Правда • Скорость • Доверие",
+    home: "Главная",
+    allNews: "Все новости",
+    search: "Поиск новостей",
+    breaking: "СРОЧНЫЕ НОВОСТИ",
+    featured: "Главная новость",
+    latest: "Последние новости",
+    noNews: "Сейчас новостей нет.",
+    error: "Произошла ошибка при загрузке новостей.",
+    language: "Язык",
+    views: "Просмотры",
+    source: "Источник",
+    admin: "Админ",
+    categories: {
+      Nigeria: "Нигерия",
+      World: "Мир",
+      Politics: "Политика",
+      Business: "Бизнес",
+      Technology: "Технологии",
+      Sports: "Спорт",
+    },
+  },
+
+  uk: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "Правда • Швидкість • Достовірність",
+    home: "Головна",
+    allNews: "Усі новини",
+    search: "Пошук новин",
+    breaking: "ТЕРМІНОВІ НОВИНИ",
+    featured: "Головна новина",
+    latest: "Останні новини",
+    noNews: "Наразі новин немає.",
+    error: "Під час завантаження новин сталася помилка.",
+    language: "Мова",
+    views: "Перегляди",
+    source: "Джерело",
+    admin: "Адмін",
+    categories: {
+      Nigeria: "Нігерія",
+      World: "Світ",
+      Politics: "Політика",
+      Business: "Бізнес",
+      Technology: "Технології",
+      Sports: "Спорт",
+    },
+  },
+
+  vi: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "Sự thật • Tốc độ • Uy tín",
+    home: "Trang chủ",
+    allNews: "Tất cả tin tức",
+    search: "Tìm kiếm tin tức",
+    breaking: "TIN MỚI NHẤT",
+    featured: "Tin nổi bật",
+    latest: "Tin mới nhất",
+    noNews: "Hiện chưa có tin tức.",
+    error: "Đã xảy ra lỗi khi tải tin tức.",
+    language: "Ngôn ngữ",
+    views: "Lượt xem",
+    source: "Nguồn",
+    admin: "Quản trị",
+    categories: {
+      Nigeria: "Nigeria",
+      World: "Thế giới",
+      Politics: "Chính trị",
+      Business: "Kinh doanh",
+      Technology: "Công nghệ",
+      Sports: "Thể thao",
+    },
+  },
+
+  zh: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "真实 • 速度 • 可信",
+    home: "首页",
+    allNews: "全部新闻",
+    search: "搜索新闻",
+    breaking: "突发新闻",
+    featured: "头条新闻",
+    latest: "最新新闻",
+    noNews: "目前没有新闻。",
+    error: "加载新闻时出现问题。",
+    language: "语言",
+    views: "浏览量",
+    source: "来源",
+    admin: "管理",
+    categories: {
+      Nigeria: "尼日利亚",
+      World: "世界",
+      Politics: "政治",
+      Business: "商业",
+      Technology: "科技",
+      Sports: "体育",
+    },
+  },
+
+  "zh-tw": {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "真實 • 速度 • 可信",
+    home: "首頁",
+    allNews: "所有新聞",
+    search: "搜尋新聞",
+    breaking: "突發新聞",
+    featured: "頭條新聞",
+    latest: "最新新聞",
+    noNews: "目前沒有新聞。",
+    error: "載入新聞時發生問題。",
+    language: "語言",
+    views: "瀏覽次數",
+    source: "來源",
+    admin: "管理",
+    categories: {
+      Nigeria: "奈及利亞",
+      World: "世界",
+      Politics: "政治",
+      Business: "商業",
+      Technology: "科技",
+      Sports: "體育",
+    },
+  },
+
+  fa: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "حقیقت • سرعت • اعتبار",
+    home: "خانه",
+    allNews: "همه اخبار",
+    search: "جستجوی اخبار",
+    breaking: "خبر فوری",
+    featured: "خبر برتر",
+    latest: "آخرین اخبار",
+    noNews: "در حال حاضر خبری وجود ندارد.",
+    error: "هنگام بارگذاری اخبار مشکلی پیش آمد.",
+    language: "زبان",
+    views: "بازدید",
+    source: "منبع",
+    admin: "مدیریت",
+    categories: {
+      Nigeria: "نیجریه",
+      World: "جهان",
+      Politics: "سیاست",
+      Business: "کسب‌وکار",
+      Technology: "فناوری",
+      Sports: "ورزش",
+    },
+  },
+
+  kr: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "Gaskiya • Sauri • Aminci",
+    home: "Gida",
+    allNews: "Labarai Gabaɗaya",
+    search: "Nemo Labarai",
+    breaking: "LABARI MAI ZAFI",
+    featured: "Babban Labari",
+    latest: "Sabbin Labarai",
+    noNews: "Babu labarai a yanzu.",
+    error: "An samu matsala wajen ɗauko labarai.",
+    language: "Harshe",
+    views: "조회수",
+    source: "출처",
+    admin: "Admin",
+    categories: {
+      Nigeria: "Najeriya",
+      World: "Duniya",
+      Politics: "Siyasa",
+      Business: "Kasuwanci",
+      Technology: "Fasaha",
+      Sports: "Wasanni",
+    },
+  },
+
+  mnk: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "Truth • Speed • Credibility",
+    home: "Home",
+    allNews: "All News",
+    search: "Search News",
+    breaking: "BREAKING NEWS",
+    featured: "Top Story",
+    latest: "Latest News",
+    noNews: "No news available.",
+    error: "There was a problem loading news.",
+    language: "Language",
+    views: "Ɲaamo",
+    source: "Ɲaamukɛ",
+    admin: "Admin",
+    categories: {
+      Nigeria: "Nigeria",
+      World: "World",
+      Politics: "Politics",
+      Business: "Business",
+      Technology: "Technology",
+      Sports: "Sports",
+    },
+  },
+
+  ff: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "Goonga • Yaawde • Hoolnaare",
+    home: "Suudu",
+    allNews: "Kabbe Kabaaruuji",
+    search: "Yiylo Kabaaruu",
+    breaking: "KABAARU JAWDI",
+    featured: "Kabaaru Mawɗo",
+    latest: "Kabaaruuji Kesɗi",
+    noNews: "Alaa kabaaru jooni.",
+    error: "Juumre waɗii e loowde kabaaruuji.",
+    language: "Ɗemngal",
+    views: "Yiyde",
+    source: "Ɓeydude",
+    admin: "Laamu",
+    categories: {
+      Nigeria: "Nijeriya",
+      World: "Duniya",
+      Politics: "Siyasa",
+      Business: "Julaagu",
+      Technology: "Teknoloji",
+      Sports: "Ciyaare",
+    },
+  },
+
+  ro: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "Adevăr • Viteză • Credibilitate",
+    home: "Acasă",
+    allNews: "Toate știrile",
+    search: "Caută știri",
+    breaking: "ȘTIRI DE ULTIMĂ ORĂ",
+    featured: "Știrea principală",
+    latest: "Ultimele știri",
+    noNews: "Nu există știri disponibile.",
+    error: "A apărut o problemă la încărcarea știrilor.",
+    language: "Limbă",
+    views: "Vizualizări",
+    source: "Sursă",
+    admin: "Administrare",
+    categories: {
+      Nigeria: "Nigeria",
+      World: "Lume",
+      Politics: "Politică",
+      Business: "Afaceri",
+      Technology: "Tehnologie",
+      Sports: "Sport",
+    },
+  },
+
+  km: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "ការពិត • ល្បឿន • ភាពជឿជាក់",
+    home: "ទំព័រដើម",
+    allNews: "ព័ត៌មានទាំងអស់",
+    search: "ស្វែងរកព័ត៌មាន",
+    breaking: "ព័ត៌មានបន្ទាន់",
+    featured: "ព័ត៌មានសំខាន់",
+    latest: "ព័ត៌មានថ្មីៗ",
+    noNews: "មិនមានព័ត៌មាននៅពេលនេះទេ។",
+    error: "មានបញ្ហាក្នុងការផ្ទុកព័ត៌មាន។",
+    language: "ភាសា",
+    views: "ការមើល",
+    source: "ប្រភព",
+    admin: "អ្នកគ្រប់គ្រង",
+    categories: {
+      Nigeria: "នីហ្សេរីយ៉ា",
+      World: "ពិភពលោក",
+      Politics: "នយោបាយ",
+      Business: "អាជីវកម្ម",
+      Technology: "បច្ចេកវិទ្យា",
+      Sports: "កីឡា",
+    },
+  },
+
+  hy: {
+    brand: "IBRAHIM SANI NEWS",
+    tagline: "Ճշմարտություն • Արագություն • Վստահելիություն",
+    home: "Գլխավոր",
+    allNews: "Բոլոր լուրերը",
+    search: "Որոնել լուրեր",
+    breaking: "ՇՏԱՊ ԼՈՒՐ",
+    featured: "Գլխավոր լուր",
+    latest: "Վերջին լուրերը",
+    noNews: "Այս պահին նորություններ չկան։",
+    error: "Լուրերը բեռնելիս խնդիր առաջացավ։",
+    language: "Լեզու",
+    views: "Դիտումներ",
+    source: "Աղբյուր",
+    admin: "Կառավարում",
+    categories: {
+      Nigeria: "Նիգերիա",
+      World: "Աշխարհ",
+      Politics: "Քաղաքականություն",
+      Business: "Բիզնես",
+      Technology: "Տեխնոլոգիա",
+      Sports: "Սպորտ",
+    },
+  },
+};
+
+export function getTranslations(lang: string) {
+  return translations[lang as LanguageCode] || translations.ha;
+}

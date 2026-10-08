@@ -2,6 +2,8 @@ import ShareButton from "./ShareButton";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "@/lib/translations";
+import TranslateButton from "@/components/TranslateButton";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -17,7 +19,8 @@ export default async function NewsArticlePage({
   const { id } = await params;
   const query = await searchParams;
 
-  const isHausa = query.lang === "ha";
+  const lang = query.lang || "ha";
+  const t = getTranslations(lang);
 
   // GET ARTICLE
   const { data: article, error } = await supabase
@@ -41,40 +44,6 @@ export default async function NewsArticlePage({
   if (!viewError) {
     article.views = Number(article.views || 0) + 1;
   }
-
-  const text = {
-    back: isHausa
-      ? "← Komawa Duk Labarai"
-      : "← Back to All News",
-
-    breaking: isHausa
-      ? "DA ƊUMI-ƊUMI"
-      : "BREAKING NEWS",
-
-    source: isHausa
-      ? "Bayanan Asali"
-      : "Source",
-
-    home: isHausa
-      ? "Gida"
-      : "Home",
-
-    allNews: isHausa
-      ? "Duk Labarai"
-      : "All News",
-
-    language: isHausa
-      ? "🇬🇧 English"
-      : "🇳🇬 Hausa",
-
-    views: isHausa
-      ? "Karatu"
-      : "Views",
-
-    video: isHausa
-      ? "VIDEO"
-      : "VIDEO",
-  };
 
   const formattedViews = Number(
     article.views || 0
@@ -108,7 +77,7 @@ export default async function NewsArticlePage({
           }}
         >
           <Link
-            href="/"
+            href={`/?lang=${encodeURIComponent(lang)}`}
             style={{
               textDecoration: "none",
               color: "#111827",
@@ -134,11 +103,7 @@ export default async function NewsArticlePage({
           </Link>
 
           <Link
-            href={
-              isHausa
-                ? `/news/${id}?lang=en`
-                : `/news/${id}?lang=ha`
-            }
+            href={`/news/${id}?lang=${encodeURIComponent(lang === "ha" ? "en" : "ha")}`}
             style={{
               border: "1px solid #d1d5db",
               padding: "9px 13px",
@@ -149,7 +114,7 @@ export default async function NewsArticlePage({
               background: "#fff",
             }}
           >
-            {text.language}
+            {t.language}
           </Link>
         </div>
 
@@ -172,25 +137,17 @@ export default async function NewsArticlePage({
             }}
           >
             <Link
-              href={
-                isHausa
-                  ? "/?lang=ha"
-                  : "/"
-              }
+              href={`/?lang=${encodeURIComponent(lang)}`}
               style={navStyle}
             >
-              🏠 {text.home}
+              🏠 {t.home}
             </Link>
 
             <Link
-              href={
-                isHausa
-                  ? "/news?lang=ha"
-                  : "/news"
-              }
+              href={`/news?lang=${encodeURIComponent(lang)}`}
               style={navStyle}
             >
-              📰 {text.allNews}
+              📰 {t.allNews}
             </Link>
           </div>
         </nav>
@@ -223,7 +180,7 @@ export default async function NewsArticlePage({
               fontSize: "12px",
             }}
           >
-            🔴 {text.breaking}
+            🔴 {t.breaking}
           </span>
 
           <span style={{ fontSize: "14px" }}>
@@ -241,11 +198,7 @@ export default async function NewsArticlePage({
         }}
       >
         <Link
-          href={
-            isHausa
-              ? "/news?lang=ha"
-              : "/news"
-          }
+          href={`/news?lang=${encodeURIComponent(lang)}`}
           style={{
             display: "inline-block",
             marginBottom: "22px",
@@ -255,7 +208,7 @@ export default async function NewsArticlePage({
             fontSize: "16px",
           }}
         >
-          {text.back}
+          {t.allNews}
         </Link>
 
         <article
@@ -302,7 +255,7 @@ export default async function NewsArticlePage({
                   fontWeight: "900",
                 }}
               >
-                ▶ {text.video}
+                ▶ {t.latest}
               </span>
             </div>
           )}
@@ -360,7 +313,7 @@ export default async function NewsArticlePage({
                   marginBottom: "16px",
                 }}
               >
-                🔴 {text.breaking}
+                🔴 {t.breaking}
               </div>
             )}
 
@@ -395,7 +348,7 @@ export default async function NewsArticlePage({
             >
               <span>
                 👁️ {formattedViews}{" "}
-                {text.views}
+                {t.views}
               </span>
 
               {article.created_at && (
@@ -451,7 +404,7 @@ export default async function NewsArticlePage({
                     marginBottom: "8px",
                   }}
                 >
-                  📌 {text.source}
+                  📌 {t.source}
                 </div>
 
                 <div
@@ -466,13 +419,23 @@ export default async function NewsArticlePage({
               </div>
             )}
 
+
+            {/* TRANSLATION */}
+            <TranslateButton
+              language={
+                lang === "ha"
+                  ? "English"
+                  : lang === "en"
+                  ? "Hausa"
+                  : lang
+              }
+              title={article.title}
+              content={article.content || ""}
+            />
+
             {/* BACK BUTTON */}
             <Link
-              href={
-                isHausa
-                  ? "/news?lang=ha"
-                  : "/news"
-              }
+              href={`/news?lang=${encodeURIComponent(lang)}`}
               style={{
                 display: "inline-block",
                 marginTop: "32px",
@@ -484,7 +447,7 @@ export default async function NewsArticlePage({
                 fontWeight: "900",
               }}
             >
-              {text.back}
+              {t.allNews}
             </Link>
           </div>
 
@@ -517,7 +480,7 @@ export default async function NewsArticlePage({
             margin: "8px 0",
           }}
         >
-          Gaskiya • Sauri • Sahihanci
+          {t.tagline}
         </p>
 
         <p

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import NewsCard from "@/components/NewsCard";
+import LanguageSelector from "@/components/LanguageSelector";
+import { getTranslations } from "@/lib/translations";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +28,8 @@ const categories = [
   { name: "Wasanni", value: "Sports", icon: "⚽" },
 ];
 
-const languages = [
+type Language = [string, string];
+const languages: Language[] = [
   ["ha", "Hausa 🇳🇬"],
   ["en", "English 🇬🇧"],
   ["ar", "العربية 🇸🇦"],
@@ -59,6 +62,7 @@ export default async function Home({
   const params = await searchParams;
   const lang = params?.lang || "ha";
   const hausa = lang === "ha";
+  const t = getTranslations(lang);
 
   const { data, error } = await supabase
     .from("news")
@@ -73,36 +77,6 @@ export default async function Home({
 
   const featured = news[0];
   const latest = news.slice(1);
-
-  const t = {
-    brand: "IBRAHIM SANI NEWS",
-
-    tagline: hausa
-      ? "Gaskiya • Sauri • Sahihanci"
-      : "Truth • Speed • Credibility",
-
-    home: hausa ? "Gida" : "Home",
-
-    allNews: hausa ? "Dukkan Labarai" : "All News",
-
-    search: hausa ? "Nemo Labari" : "Search News",
-
-    breaking: hausa ? "LABARI MAI ZAFI" : "BREAKING NEWS",
-
-    featured: hausa ? "Babban Labari" : "Top Story",
-
-    latest: hausa ? "Sabbin Labarai" : "Latest News",
-
-    noNews: hausa
-      ? "Babu labarai a halin yanzu."
-      : "No news available at the moment.",
-
-    error: hausa
-      ? "An samu matsala wajen ɗauko labarai."
-      : "There was a problem loading the news.",
-
-    language: hausa ? "Harshe" : "Language",
-  };
 
   return (
     <main className="site-main">
@@ -133,7 +107,7 @@ export default async function Home({
         >
           {/* LOGO */}
           <Link
-            href="/"
+            href={`/?lang=${encodeURIComponent(lang)}`}
             style={{
               color: "#fff",
               textDecoration: "none",
@@ -162,76 +136,24 @@ export default async function Home({
               alignItems: "center",
             }}
           >
-            <Link href="/" style={navStyle}>
+            <Link href={`/?lang=${encodeURIComponent(lang)}`} style={navStyle}>
               {t.home}
             </Link>
 
-            <Link href="/news" style={navStyle}>
+            <Link href={`/news?lang=${encodeURIComponent(lang)}`} style={navStyle}>
               {t.allNews}
             </Link>
 
-            <Link href="/admin" style={navStyle}>
-              ⚙️ Admin
+            <Link href={`/admin?lang=${encodeURIComponent(lang)}`} style={navStyle}>
+              ⚙️ {t.admin}
             </Link>
 
             {/* LANGUAGE SELECTOR */}
-            <details style={{ position: "relative" }}>
-              <summary
-                style={{
-                  listStyle: "none",
-                  cursor: "pointer",
-                  background: "#dc1e2b",
-                  color: "#fff",
-                  padding: "10px 14px",
-                  borderRadius: 7,
-                  fontWeight: 700,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                🌐 {t.language} ▾
-              </summary>
-
-              <div
-                style={{
-                  position: "absolute",
-                  right: 0,
-                  top: "calc(100% + 8px)",
-                  width: 320,
-                  maxHeight: 420,
-                  overflowY: "auto",
-                  background: "#fff",
-                  color: "#111827",
-                  borderRadius: 10,
-                  padding: 12,
-                  boxShadow: "0 10px 30px rgba(0,0,0,.25)",
-                  zIndex: 100,
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 4,
-                }}
-              >
-                {languages.map(([code, name]) => (
-                  <Link
-                    key={code}
-                    href={`/?lang=${code}`}
-                    style={{
-                      textDecoration: "none",
-                      color: "#111827",
-                      padding: "10px 8px",
-                      borderRadius: 6,
-                      fontSize: 14,
-                      fontWeight: code === lang ? 800 : 500,
-                      direction:
-                        code === "ar" || code === "fa"
-                          ? "rtl"
-                          : "ltr",
-                    }}
-                  >
-                    {name}
-                  </Link>
-                ))}
-              </div>
-            </details>
+            <LanguageSelector
+              languages={languages}
+              currentLang={lang}
+              label={t.language}
+            />
           </nav>
         </div>
       </header>
@@ -348,10 +270,10 @@ export default async function Home({
           {categories.map((cat) => (
             <Link
               key={cat.value}
-              href={`/news?category=${encodeURIComponent(cat.value)}`}
+              href={`/news?category=${encodeURIComponent(cat.value)}&lang=${encodeURIComponent(lang)}`}
               className="category-pill"
             >
-              {cat.icon} {cat.name}
+              {cat.icon} {t.categories[cat.value as keyof typeof t.categories]}
             </Link>
           ))}
         </div>
@@ -387,7 +309,7 @@ export default async function Home({
             🔥 {t.featured}
           </h2>
 
-          <Link href="/news" className="section-link">
+          <Link href={`/news?lang=${encodeURIComponent(lang)}`} className="section-link">
             {t.allNews} →
           </Link>
         </div>
@@ -397,7 +319,7 @@ export default async function Home({
           <div style={{ marginBottom: 35 }}>
             <NewsCard
               item={featured}
-              lang={hausa ? "ha" : "en"}
+              lang={lang}
               featured
             />
           </div>
@@ -442,7 +364,7 @@ export default async function Home({
                 <NewsCard
                   key={item.id}
                   item={item}
-                  lang={hausa ? "ha" : "en"}
+                  lang={lang}
                 />
               ))}
             </div>
@@ -510,15 +432,15 @@ export default async function Home({
               flexWrap: "wrap",
             }}
           >
-            <Link href="/" style={footerLink}>
+            <Link href={`/?lang=${encodeURIComponent(lang)}`} style={footerLink}>
               {t.home}
             </Link>
 
-            <Link href="/news" style={footerLink}>
+            <Link href={`/news?lang=${encodeURIComponent(lang)}`} style={footerLink}>
               {t.allNews}
             </Link>
 
-            <Link href="/admin" style={footerLink}>
+            <Link href={`/admin?lang=${encodeURIComponent(lang)}`} style={footerLink}>
               Admin
             </Link>
           </div>

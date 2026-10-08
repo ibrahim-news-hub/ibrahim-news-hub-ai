@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 type NewsItem = {
   id: number | string;
@@ -15,8 +18,33 @@ type NewsItem = {
 
 type NewsCardProps = {
   item: NewsItem;
-  lang?: "ha" | "en";
+  lang?: string;
   featured?: boolean;
+};
+
+const languageNames: Record<string, string> = {
+  ha: "Hausa",
+  en: "English",
+  yo: "Yorùbá",
+  ig: "Igbo",
+  kr: "Kanuri",
+  ar: "Arabic",
+  fr: "French",
+  es: "Spanish",
+  pt: "Portuguese",
+  "pt-br": "Brazilian Portuguese",
+  sw: "Kiswahili",
+  mnk: "Mandinka",
+  ff: "Fulfulde",
+  ro: "Romanian",
+  ru: "Russian",
+  uk: "Ukrainian",
+  vi: "Vietnamese",
+  km: "Khmer",
+  zh: "Simplified Chinese",
+  "zh-tw": "Traditional Chinese",
+  hy: "Armenian",
+  fa: "Persian",
 };
 
 function shortText(text: string, length = 150) {
@@ -27,15 +55,41 @@ function shortText(text: string, length = 150) {
     : clean;
 }
 
-function formatDate(date?: string | null) {
+function formatDate(date?: string | null, lang = "ha") {
   if (!date) return "";
 
   try {
-    return new Date(date).toLocaleDateString("ha-NG", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
+    const locales: Record<string, string> = {
+      ha: "ha-NG",
+      en: "en-US",
+      yo: "yo-NG",
+      ig: "ig-NG",
+      ar: "ar-SA",
+      fr: "fr-FR",
+      es: "es-ES",
+      pt: "pt-PT",
+      "pt-br": "pt-BR",
+      sw: "sw-TZ",
+      ru: "ru-RU",
+      uk: "uk-UA",
+      vi: "vi-VN",
+      zh: "zh-CN",
+      "zh-tw": "zh-TW",
+      fa: "fa-IR",
+      ro: "ro-RO",
+      hy: "hy-AM",
+    };
+
+    const d = new Date(date);
+    if (Number.isNaN(d.getTime())) return "";
+
+    const months: Record<string, string[]> = {
+      ha: ["Jan", "Fab", "Mar", "Afr", "May", "Yun", "Yul", "Agu", "Sat", "Okt", "Nuw", "Dis"],
+      en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    };
+
+    const monthList = months[lang] || months.en;
+    return `${d.getUTCDate()} ${monthList[d.getUTCMonth()]}, ${d.getUTCFullYear()}`;
   } catch {
     return "";
   }
@@ -58,10 +112,12 @@ function formatViews(views?: number | null) {
 function getSource(source?: string | null) {
   if (!source) return "IBRAHIM SANI NEWS";
 
-  return source
-    .replace(/^https?:\/\/[^/]+/i, "")
-    .split(" — ")[0]
-    .trim() || "IBRAHIM SANI NEWS";
+  return (
+    source
+      .replace(/^https?:\/\/[^/]+/i, "")
+      .split(" — ")[0]
+      .trim() || "IBRAHIM SANI NEWS"
+  );
 }
 
 export default function NewsCard({
@@ -69,17 +125,78 @@ export default function NewsCard({
   lang = "ha",
   featured = false,
 }: NewsCardProps) {
+  const [title, setTitle] = useState(item.title);
+  const [content, setContent] = useState(item.content || "");
+  const [translating, setTranslating] = useState(false);
+
+  const languageName = languageNames[lang] || "English";
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function translateNews() {
+      if (lang === "ha" || lang === "en") {
+        setTitle(item.title);
+        setContent(item.content || "");
+        return;
+      }
+
+      setTranslating(true);
+
+      try {
+        const response = await fetch("/api/translate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            language: languageName,
+            title: item.title,
+            content: item.content || "",
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!cancelled && data.success) {
+          setTitle(data.title || item.title);
+          setContent(data.content || item.content || "");
+        }
+      } catch (error) {
+        console.error("Translation error:", error);
+      } finally {
+        if (!cancelled) {
+          setTranslating(false);
+        }
+      }
+    }
+
+    translateNews();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [lang, item.title, item.content, languageName]);
+
   const breakingText =
-    lang === "en" ? "BREAKING" : "DA ƊUMI-ƊUMI";
+    lang === "en"
+      ? "BREAKING"
+      : lang === "ha"
+        ? "DA ƊUMI-ƊUMI"
+        : "BREAKING";
 
   const readMore =
-    lang === "en" ? "Read more →" : "Karanta cikakken labari →";
+    lang === "en"
+      ? "Read more →"
+      : lang === "ha"
+        ? "Karanta cikakken labari →"
+        : "Read more →";
 
   const sourceText = getSource(item.source);
 
   return (
     <Link
-      href={`/news/${item.id}`}
+      href={`/news/${item.id}?lang=${encodeURIComponent(lang)}`}
       className={`news-card-link ${
         featured ? "news-card-featured" : ""
       }`}
@@ -98,7 +215,7 @@ export default function NewsCard({
           ) : item.image_url ? (
             <img
               src={item.image_url}
-              alt={item.title}
+              alt={title}
               className="news-card-image"
               loading="lazy"
             />
@@ -109,14 +226,14 @@ export default function NewsCard({
             </div>
           )}
 
-          {/* VIDEO BADGE */}
+          {/* VIDEO */}
           {item.video_url && (
             <span className="video-badge">
               ▶ VIDEO
             </span>
           )}
 
-          {/* BREAKING BADGE */}
+          {/* BREAKING */}
           {item.is_breaking && (
             <span className="breaking-badge">
               🔴 {breakingText}
@@ -134,15 +251,17 @@ export default function NewsCard({
         {/* CONTENT */}
         <div className="news-card-body">
           <h3 className="news-card-title">
-            {item.title}
+            {translating ? "..." : title}
           </h3>
 
-          {item.content && (
+          {content && (
             <p className="news-card-text">
-              {shortText(
-                item.content,
-                featured ? 230 : 130
-              )}
+              {translating
+                ? "..."
+                : shortText(
+                    content,
+                    featured ? 230 : 130
+                  )}
             </p>
           )}
 
@@ -154,7 +273,7 @@ export default function NewsCard({
 
             {item.created_at && (
               <span title="Date">
-                📅 {formatDate(item.created_at)}
+                📅 {formatDate(item.created_at, lang)}
               </span>
             )}
 
