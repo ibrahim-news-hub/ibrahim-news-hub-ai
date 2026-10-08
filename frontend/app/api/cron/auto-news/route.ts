@@ -12,24 +12,11 @@ type NewsItem = {
   publishedAt: string;
 };
 
-type RewrittenNews = {
-  title: string;
-  article: string;
-};
-
 type Feed = {
   name: string;
   url: string;
   region: string;
 };
-
-const NEWS_IMAGE_BUCKET = "news-images";
-
-/*
-|--------------------------------------------------------------------------
-| CLEANERS
-|--------------------------------------------------------------------------
-*/
 
 function cleanText(value: string) {
   return value
@@ -59,146 +46,22 @@ function normalizeTitle(value: string) {
     .trim();
 }
 
-function normalizeUrl(url: string): string {
+function normalizeUrl(url: string) {
   try {
     const parsed = new URL(url);
     parsed.hash = "";
     parsed.search = "";
-    return parsed.toString().replace(/\/$/, "");
+
+    return parsed
+      .toString()
+      .replace(/\/$/, "");
   } catch {
-    return url.trim().toLowerCase().replace(/\/$/, "");
+    return url
+      .trim()
+      .toLowerCase()
+      .replace(/\/$/, "");
   }
 }
-
-/*
-|--------------------------------------------------------------------------
-| CATEGORY
-|--------------------------------------------------------------------------
-*/
-
-function getCategory(title: string) {
-  const text = title.toLowerCase();
-
-  if (
-    /nigeria|abuja|kaduna|kano|lagos|ibadan|jos|sokoto|zamfara|katsina|kwara|benue|borno|yobe|governor|president|senate|house of representatives|tinubu|atiku|pdp|apc|labour party/.test(
-      text
-    )
-  ) {
-    return "Nigeria";
-  }
-
-  if (
-    /africa|ghana|kenya|south africa|sudan|ethiopia|somalia|egypt|libya|niger republic|chad|cameroon|mali|burkina|senegal|uganda|tanzania|rwanda|congo/.test(
-      text
-    )
-  ) {
-    return "Africa";
-  }
-
-  if (
-    /iran|israel|palestine|gaza|hamas|hezbollah|lebanon|syria|iraq|yemen|houthi|saudi|saudi arabia|qatar|uae|united arab emirates|jordan|middle east/.test(
-      text
-    )
-  ) {
-    return "Middle East";
-  }
-
-  if (
-    /russia|ukraine|moscow|kremlin|putin/.test(text)
-  ) {
-    return "Russia";
-  }
-
-  if (
-    /china|beijing|taiwan|hong kong|chinese/.test(text)
-  ) {
-    return "China";
-  }
-
-  if (
-    /ai|artificial intelligence|technology|tech|google|apple|microsoft|meta|openai|robot|cyber|chip|semiconductor|software/.test(
-      text
-    )
-  ) {
-    return "Technology";
-  }
-
-  if (
-    /business|economy|market|bank|oil|finance|dollar|investment|company|stock|shares|inflation|trade/.test(
-      text
-    )
-  ) {
-    return "Business";
-  }
-
-  if (
-    /football|soccer|sport|match|league|player|championship|fifa|premier league/.test(
-      text
-    )
-  ) {
-    return "Sports";
-  }
-
-  return "World";
-}
-
-/*
-|--------------------------------------------------------------------------
-| IMAGE STYLE
-|--------------------------------------------------------------------------
-*/
-
-function getImageStyle(category: string, title: string) {
-  const styles = [
-    "professional international newsroom photography, cinematic composition",
-    "modern breaking-news editorial graphic, dramatic newsroom lighting",
-    "high-end documentary photojournalism, realistic natural lighting",
-    "clean international news magazine cover style",
-    "modern African digital newsroom visual, premium editorial composition",
-    "cinematic geopolitical news illustration with realistic environments",
-    "minimal premium news graphic with strong visual hierarchy",
-    "dynamic world-news editorial photography with atmospheric lighting",
-  ];
-
-  const hash = Array.from(title).reduce(
-    (total, char) => total + char.charCodeAt(0),
-    0
-  );
-
-  const style = styles[hash % styles.length];
-
-  const categoryDirection: Record<string, string> = {
-    Nigeria:
-      "Focus on Nigeria, Nigerian environment, Nigerian people or institutions when relevant.",
-    Africa:
-      "Use an authentic African visual environment relevant to the story.",
-    "Middle East":
-      "Use a realistic Middle Eastern environment relevant to the story.",
-    Russia:
-      "Use a realistic Russian environment, architecture or geography when relevant.",
-    China:
-      "Use a realistic Chinese environment, architecture or city setting when relevant.",
-    Technology:
-      "Use modern technology, computers, AI, data or digital infrastructure when relevant.",
-    Business:
-      "Use professional finance, commerce, business or economic imagery when relevant.",
-    Sports:
-      "Use a realistic sports-news visual appropriate to the story.",
-    World:
-      "Use a realistic international-news environment appropriate to the story.",
-  };
-
-  return `${style}. ${
-    categoryDirection[category] ||
-    categoryDirection.World
-  }`;
-}
-
-/*
-|--------------------------------------------------------------------------
-| RSS SOURCES
-|--------------------------------------------------------------------------
-*/
 
 function getFeeds(): Feed[] {
   return [
@@ -252,15 +115,6 @@ function getFeeds(): Feed[] {
       url: "https://www.theguardian.com/world/rss",
       region: "World",
     },
-
-    /*
-    |--------------------------------------------------------------------------
-    | GOOGLE NEWS RSS
-    |--------------------------------------------------------------------------
-    | These broaden coverage beyond BBC and Al Jazeera.
-    |--------------------------------------------------------------------------
-    */
-
     {
       name: "Google News Nigeria",
       url:
@@ -318,25 +172,20 @@ function getFeeds(): Feed[] {
   ];
 }
 
-/*
-|--------------------------------------------------------------------------
-| RSS PARSER
-|--------------------------------------------------------------------------
-*/
-
 function extractTag(
   item: string,
   tag: string
 ): string {
-  const cdata =
-    item.match(
-      new RegExp(
-        `<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>`,
-        "i"
-      )
-    )?.[1];
+  const cdata = item.match(
+    new RegExp(
+      `<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>`,
+      "i"
+    )
+  )?.[1];
 
-  if (cdata) return cdata;
+  if (cdata) {
+    return cdata;
+  }
 
   return (
     item.match(
@@ -350,7 +199,6 @@ function extractTag(
 
 async function getFeedItems(): Promise<NewsItem[]> {
   const feeds = getFeeds();
-
   const allItems: NewsItem[] = [];
 
   for (const feed of feeds) {
@@ -358,7 +206,8 @@ async function getFeedItems(): Promise<NewsItem[]> {
       const response = await fetch(feed.url, {
         cache: "no-store",
         headers: {
-          "User-Agent": "Ibrahim-News-Hub-AI/3.0",
+          "User-Agent":
+            "Ibrahim-News-Hub-AI/4.0",
           Accept:
             "application/rss+xml, application/xml, text/xml",
         },
@@ -420,12 +269,6 @@ async function getFeedItems(): Promise<NewsItem[]> {
     }
   }
 
-  /*
-  |--------------------------------------------------------------------------
-  | NEWEST FIRST
-  |--------------------------------------------------------------------------
-  */
-
   allItems.sort((a, b) => {
     const aTime = Date.parse(a.publishedAt);
     const bTime = Date.parse(b.publishedAt);
@@ -440,18 +283,17 @@ async function getFeedItems(): Promise<NewsItem[]> {
     return bTime - aTime;
   });
 
-  /*
-  |--------------------------------------------------------------------------
-  | REMOVE DUPLICATES INSIDE THE RSS RESULT
-  |--------------------------------------------------------------------------
-  */
-
   const seenTitles = new Set<string>();
   const seenUrls = new Set<string>();
 
   return allItems.filter((item) => {
-    const title = normalizeTitle(item.title);
-    const url = normalizeUrl(item.link);
+    const title = normalizeTitle(
+      item.title
+    );
+
+    const url = normalizeUrl(
+      item.link
+    );
 
     if (
       seenTitles.has(title) ||
@@ -467,419 +309,75 @@ async function getFeedItems(): Promise<NewsItem[]> {
   });
 }
 
-/*
-|--------------------------------------------------------------------------
-| AI NEWS WRITER
-|--------------------------------------------------------------------------
-*/
-async function rewriteNewsWithAI(
-  item: NewsItem
-): Promise<RewrittenNews> {
-  const apiKey = process.env.GROQ_API_KEY;
-
-  if (!apiKey) {
-    throw new Error("GROQ_API_KEY is missing.");
-  }
-
-  const category = getCategory(item.title);
-
-  const prompt = `
-Kai ƙwararren editan labarai ne na IBRAHIM SANI NEWS (ISN).
-
-Ka sake rubuta wannan rahoto cikin Hausa mai kyau,
-mai sauƙin fahimta kuma cikin salon ƙwararren gidan labarai.
-
-CATEGORY:
-${category}
-
-SOURCE:
-${item.source}
-
-SOURCE TITLE:
-${item.title}
-
-SOURCE DESCRIPTION:
-${item.description}
-
-MUHIMMAN ƘA'IDOJI:
-
-1. Kada ka ƙirƙiri wani sabon bayani.
-2. Kada ka ƙara sunaye, lambobi, wurare ko bayanan da source bai bayar ba.
-3. Kada ka canza ma'anar rahoton.
-4. Idan bayanin zargi ne, ka rubuta shi a matsayin zargi.
-5. Idan rahoton bai tabbatar da wani abu ba, kada ka gabatar da shi a matsayin tabbataccen abu.
-6. Kada ka yi sensationalism.
-7. Kada ka yi amfani da kalmomin da za su iya yaudarar mai karatu.
-8. Taken ya kasance Hausa.
-9. Taken ya kasance gajere, ƙarfi kuma ƙwararre.
-10. Labarin ya kasance sakin layi 4 zuwa 6.
-11. Kada ka kwafi jimlolin source kai tsaye.
-12. Kada ka ambaci AI.
-13. Kada ka yi Markdown.
-14. Idan bayanin source ya yi kaɗan, kada ka ƙirƙiri ƙarin bayani.
-15. Ka yi amfani da "Rahotanni sun ce" ko makamancin haka idan source bai tabbatar da cikakken bayani ba.
-16. Kada ka rubuta ra'ayi naka.
-17. Ka kula sosai da sunayen ƙasashe, shugabanni, ƙungiyoyi da wurare.
-
-Ka dawo da JSON kawai mai wannan tsarin:
-
-{
-  "title": "Taken Hausa",
-  "article": "Labarin Hausa"
-}
-
-Kada ka saka markdown fences kamar \`\`\`json.
-`;
-
-  const response = await fetch(
-    "https://api.groq.com/openai/v1/chat/completions",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "openai/gpt-oss-20b",
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        temperature: 0.2,
-        response_format: {
-          type: "json_object",
-        },
-        max_completion_tokens: 1200,
-      }),
-    }
-  );
-
-  if (!response.ok) {
-    const errorText = await response.text();
-
-    throw new Error(
-      `Groq API error (${response.status}): ${errorText}`
-    );
-  }
-
-  const result = await response.json();
-
-  const message = result?.choices?.[0]?.message;
-  const output =
-    typeof message?.content === "string"
-      ? message.content.trim()
-      : "";
-
-  if (!output) {
-    console.error(
-      "GROQ EMPTY RESPONSE:",
-      JSON.stringify(result)
-    );
-
-    throw new Error(
-      "Groq bai dawo da wani bayani ba."
-    );
-  }
-
-  let jsonText = output;
-
-  const firstBrace = output.indexOf("{");
-  const lastBrace = output.lastIndexOf("}");
+function getCategory(title: string) {
+  const text = title.toLowerCase();
 
   if (
-    firstBrace !== -1 &&
-    lastBrace !== -1 &&
-    lastBrace > firstBrace
+    /nigeria|abuja|kaduna|kano|lagos|ibadan|jos|sokoto|zamfara|katsina|kwara|benue|borno|yobe|governor|president|senate|house of representatives|tinubu|atiku|pdp|apc|labour party/.test(
+      text
+    )
   ) {
-    jsonText = output.slice(
-      firstBrace,
-      lastBrace + 1
-    );
-  }
-
-  let parsed: {
-    title?: string;
-    article?: string;
-  };
-
-  try {
-    parsed = JSON.parse(jsonText);
-  } catch {
-    console.error(
-      "GROQ INVALID JSON:",
-      output
-    );
-
-    throw new Error(
-      "AI ya dawo da JSON mara inganci."
-    );
+    return "Nigeria";
   }
 
   if (
-    !parsed.title?.trim() ||
-    !parsed.article?.trim()
+    /africa|ghana|kenya|south africa|sudan|ethiopia|somalia|egypt|libya|niger republic|chad|cameroon|mali|burkina|senegal|uganda|tanzania|rwanda|congo/.test(
+      text
+    )
   ) {
-    console.error(
-      "GROQ MISSING TITLE OR ARTICLE:",
-      JSON.stringify(parsed)
-    );
-
-    throw new Error(
-      "AI bai dawo da title ko article ba."
-    );
+    return "Africa";
   }
-
-  return {
-    title: parsed.title.trim(),
-    article: parsed.article.trim(),
-  };
-}
-
-/*
-|--------------------------------------------------------------------------
-| OPENAI IMAGE GENERATION
-|--------------------------------------------------------------------------
-*/
-
-async function generateISNImage(
-  title: string,
-  article: string,
-  category: string
-): Promise<string> {
-  const apiKey =
-    process.env.OPENAI_API_KEY;
-
-  if (!apiKey) {
-    throw new Error(
-      "OPENAI_API_KEY is missing."
-    );
-  }
-
-  const style = getImageStyle(
-    category,
-    title
-  );
-
-  const prompt = `
-Create an original 16:9 professional news graphic
-for a Nigerian digital news organization called:
-
-IBRAHIM SANI NEWS (ISN)
-
-This must be an ORIGINAL editorial graphic.
-
-IMPORTANT:
-- Do NOT use BBC branding.
-- Do NOT use Al Jazeera branding.
-- Do NOT use Reuters branding.
-- Do NOT use CNN branding.
-- Do NOT use any other news organization's logo.
-- Do NOT copy an existing news graphic.
-- Do NOT reproduce any source outlet's watermark.
-- The visual must be original.
-
-BRANDING:
-Use a premium Nigerian newsroom identity.
-Use deep green, white, dark gray and gold.
-Use red only as a breaking-news accent.
-Include clear text:
-"IBRAHIM SANI NEWS (ISN)"
-
-LAYOUT:
-Professional Facebook news graphic.
-Strong visual hierarchy.
-Clean typography.
-Modern international newsroom appearance.
-Make the main subject visually dominant.
-Leave a clean area for headline treatment.
-
-NEWS CATEGORY:
-${category}
-
-HEADLINE:
-${title}
-
-NEWS CONTEXT:
-${article.slice(0, 1600)}
-
-VISUAL STYLE:
-${style}
-
-Create a realistic, professional editorial image.
-Avoid graphic violence, gore or disturbing imagery.
-Do not show fake logos of real organizations.
-Do not create misleading documentary evidence.
-`;
-
-  const response = await fetch(
-    "https://api.openai.com/v1/images/generations",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gpt-image-2",
-        prompt,
-        size: "1536x864",
-        quality: "medium",
-        output_format: "png",
-      }),
-    }
-  );
-
-  if (!response.ok) {
-    const errorText =
-      await response.text();
-
-    throw new Error(
-      `OpenAI Image API error: ${errorText}`
-    );
-  }
-
-  const result =
-    await response.json();
-
-  const base64 =
-    result.data?.[0]?.b64_json;
-
-  if (!base64) {
-    throw new Error(
-      "OpenAI bai dawo da hoton base64 ba."
-    );
-  }
-
-  /*
-  |--------------------------------------------------------------------------
-  | UPLOAD TO SUPABASE STORAGE
-  |--------------------------------------------------------------------------
-  */
-
-  const serviceRoleKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  const supabaseUrl =
-    process.env.NEXT_PUBLIC_SUPABASE_URL;
 
   if (
-    !serviceRoleKey ||
-    !supabaseUrl
+    /iran|israel|palestine|gaza|hamas|hezbollah|lebanon|syria|iraq|yemen|houthi|saudi|qatar|uae|united arab emirates|jordan|middle east/.test(
+      text
+    )
   ) {
-    throw new Error(
-      "Supabase Storage environment variables sun ɓace."
-    );
+    return "Middle East";
   }
 
-  const imageBuffer =
-    Buffer.from(base64, "base64");
-
-  const safeTitle =
-    normalizeTitle(title)
-      .replace(/\s+/g, "-")
-      .slice(0, 70) ||
-    "isn-news";
-
-  const fileName =
-    `auto-news/${Date.now()}-${safeTitle}.png`;
-
-  const uploadResponse =
-    await fetch(
-      `${supabaseUrl}/storage/v1/object/${NEWS_IMAGE_BUCKET}/${fileName}`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${serviceRoleKey}`,
-          apikey: serviceRoleKey,
-          "Content-Type": "image/png",
-          "x-upsert": "true",
-        },
-        body: imageBuffer,
-      }
-    );
-
-  if (!uploadResponse.ok) {
-    const errorText =
-      await uploadResponse.text();
-
-    throw new Error(
-      `Supabase image upload error: ${errorText}`
-    );
+  if (
+    /russia|ukraine|moscow|kremlin|putin/.test(
+      text
+    )
+  ) {
+    return "Russia";
   }
 
-  const publicUrl =
-    `${supabaseUrl}/storage/v1/object/public/${NEWS_IMAGE_BUCKET}/${fileName}`;
+  if (
+    /china|beijing|taiwan|hong kong|chinese/.test(
+      text
+    )
+  ) {
+    return "China";
+  }
 
-  return publicUrl;
+  if (
+    /ai|artificial intelligence|technology|tech|google|apple|microsoft|meta|openai|robot|cyber|chip|semiconductor|software/.test(
+      text
+    )
+  ) {
+    return "Technology";
+  }
+
+  if (
+    /business|economy|market|bank|oil|finance|dollar|investment|company|stock|shares|inflation|trade/.test(
+      text
+    )
+  ) {
+    return "Business";
+  }
+
+  if (
+    /football|soccer|sport|match|league|player|championship|fifa|premier league/.test(
+      text
+    )
+  ) {
+    return "Sports";
+  }
+
+  return "World";
 }
-
-/*
-|--------------------------------------------------------------------------
-| MAKE WEBHOOK
-|--------------------------------------------------------------------------
-*/
-
-async function sendNewsToMake(payload: {
-  title: string;
-  article: string;
-  caption: string;
-  image_url: string;
-  category: string;
-  source_url: string;
-}) {
-  const webhookUrl =
-    process.env.MAKE_WEBHOOK_URL;
-
-  if (!webhookUrl) {
-    console.error(
-      "MAKE_WEBHOOK_URL is missing."
-    );
-    return;
-  }
-
-  try {
-    const response = await fetch(
-      webhookUrl,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      }
-    );
-
-    if (!response.ok) {
-      const errorText =
-        await response.text();
-
-      console.error(
-        "MAKE WEBHOOK ERROR:",
-        response.status,
-        errorText
-      );
-
-      return;
-    }
-
-    console.log(
-      "MAKE WEBHOOK: ISN news sent successfully."
-    );
-  } catch (error) {
-    console.error(
-      "MAKE WEBHOOK FETCH ERROR:",
-      error
-    );
-  }
-}
-
-/*
-|--------------------------------------------------------------------------
-| GET
-|--------------------------------------------------------------------------
-*/
 
 export async function GET(
   request: Request
@@ -895,9 +393,6 @@ export async function GET(
       request.headers.get(
         "authorization"
       );
-
-    const testMode =
-      new URL(request.url).searchParams.get("test") === "1";
 
     const cronSecret =
       process.env.CRON_SECRET;
@@ -928,7 +423,7 @@ export async function GET(
 
     /*
     |--------------------------------------------------------------------------
-    | GET NEWS
+    | GET RSS NEWS
     |--------------------------------------------------------------------------
     */
 
@@ -939,7 +434,7 @@ export async function GET(
       return NextResponse.json({
         success: true,
         found: 0,
-        published: 0,
+        queued: 0,
         message:
           "Ba a samu sabbin labarai ba.",
       });
@@ -947,7 +442,7 @@ export async function GET(
 
     /*
     |--------------------------------------------------------------------------
-    | RECENT DATABASE NEWS
+    | EXISTING PUBLISHED NEWS
     |--------------------------------------------------------------------------
     */
 
@@ -957,230 +452,207 @@ export async function GET(
     } = await supabase
       .from("news")
       .select(
-        "id,title,source,source_name,source_url"
+        "id,title,source_url"
       )
       .order("created_at", {
         ascending: false,
       })
-      .limit(200);
+      .limit(300);
 
     if (recentError) {
       throw recentError;
     }
 
-    let publishedCount = 0;
-
     /*
     |--------------------------------------------------------------------------
-    | FIND ONE NEW STORY
+    | EXISTING QUEUE
     |--------------------------------------------------------------------------
     */
 
+    const {
+      data: existingQueue,
+      error: queueError,
+    } = await supabase
+      .from("news_queue")
+      .select(
+        "id,title,source_url,status"
+      )
+      .in("status", [
+        "queued",
+        "processing",
+      ])
+      .limit(300);
+
+    if (queueError) {
+      throw queueError;
+    }
+
+    const publishedTitles =
+      new Set(
+        (recentNews || []).map(
+          (news) =>
+            normalizeTitle(
+              news.title
+            )
+        )
+      );
+
+    const publishedUrls =
+      new Set(
+        (recentNews || [])
+          .map((news) =>
+            news.source_url
+              ? normalizeUrl(
+                  news.source_url
+                )
+              : ""
+          )
+          .filter(Boolean)
+      );
+
+    const queuedTitles =
+      new Set(
+        (existingQueue || []).map(
+          (item) =>
+            normalizeTitle(
+              item.title
+            )
+        )
+      );
+
+    const queuedUrls =
+      new Set(
+        (existingQueue || [])
+          .map((item) =>
+            item.source_url
+              ? normalizeUrl(
+                  item.source_url
+                )
+              : ""
+          )
+          .filter(Boolean)
+      );
+
+    /*
+    |--------------------------------------------------------------------------
+    | BUILD QUEUE
+    |--------------------------------------------------------------------------
+    */
+
+    const queueRows: Array<{
+      title: string;
+      article: string;
+      caption: string;
+      image_url: string | null;
+      category: string;
+      source_url: string;
+      status: "queued";
+      scheduled_at: string;
+      attempts: number;
+    }> = [];
+
     for (const item of items) {
+      if (queueRows.length >= 50) {
+        break;
+      }
+
       const normalizedTitle =
-        normalizeTitle(item.title);
+        normalizeTitle(
+          item.title
+        );
 
       const normalizedUrl =
-        normalizeUrl(item.link);
-
-      const duplicate =
-        (recentNews || []).some(
-          (news) => {
-            const oldUrl =
-              news.source_url
-                ? normalizeUrl(
-                    news.source_url
-                  )
-                : "";
-
-            return (
-              (oldUrl &&
-                oldUrl ===
-                  normalizedUrl) ||
-              normalizeTitle(
-                news.title
-              ) === normalizedTitle
-            );
-          }
+        normalizeUrl(
+          item.link
         );
 
-      if (duplicate && !testMode) {
+      if (
+        publishedTitles.has(
+          normalizedTitle
+        ) ||
+        publishedUrls.has(
+          normalizedUrl
+        )
+      ) {
         continue;
       }
 
-      /*
-      |--------------------------------------------------------------------------
-      | CATEGORY
-      |--------------------------------------------------------------------------
-      */
+      if (
+        queuedTitles.has(
+          normalizedTitle
+        ) ||
+        queuedUrls.has(
+          normalizedUrl
+        )
+      ) {
+        continue;
+      }
 
       const category =
-        getCategory(item.title);
-
-      /*
-      |--------------------------------------------------------------------------
-      | AI HAUSA ARTICLE
-      |--------------------------------------------------------------------------
-      */
-
-      let rewritten: RewrittenNews;
-
-      try {
-        rewritten =
-          await rewriteNewsWithAI(
-            item
-          );
-      } catch (error) {
-        console.error(
-          "AI REWRITE FAILED:",
-          error
+        getCategory(
+          item.title
         );
 
-        continue;
-      }
+      const article =
+        item.description ||
+        item.title;
 
-      /*
-      |--------------------------------------------------------------------------
-      | ORIGINAL ISN IMAGE
-      |--------------------------------------------------------------------------
-      */
+      const caption =
+        `📰 ${item.title}\n\n` +
+        `${article}\n\n` +
+        `IBRAHIM SANI NEWS (ISN)\n\n` +
+        `#ISN #IbrahimSaniNews`;
 
-      let imageUrl = "";
-
-      try {
-        imageUrl =
-          await generateISNImage(
-            rewritten.title,
-            rewritten.article,
-            category
-          );
-      } catch (error) {
-        console.error(
-          "ISN IMAGE GENERATION FAILED:",
-          error
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | IMPORTANT:
-        | We do NOT fall back to the source image.
-        | This guarantees BBC/Al Jazeera/etc images
-        | are never sent to Make.
-        |--------------------------------------------------------------------------
-        */
-
-        continue;
-      }
-
-      /*
-      |--------------------------------------------------------------------------
-      | SAVE NEWS TO SUPABASE
-      |--------------------------------------------------------------------------
-      */
-
-      const {
-        error: insertError,
-      } = await supabase
-        .from("news")
-        .insert({
-          title: rewritten.title,
-          content: rewritten.article,
-
-          source:
-            `${item.source} — ${item.link}`,
-
-          source_name:
-            item.source,
-
-          source_url:
-            item.link,
-
-          category,
-
-          /*
-          | IMPORTANT:
-          | This is now the ORIGINAL ISN image,
-          | not the source image.
-          */
-
-          image_url:
-            imageUrl,
-
-          video_url:
-            null,
-
-          published: true,
-
-          views: 0,
-
-          is_breaking: false,
-        });
-
-      if (insertError) {
-        console.error(
-          "SUPABASE INSERT ERROR:",
-          insertError
-        );
-
-        continue;
-      }
-
-      publishedCount++;
-
-      /*
-      |--------------------------------------------------------------------------
-      | FACEBOOK CAPTION
-      |--------------------------------------------------------------------------
-      */
-
-      const facebookCaption =
-        `🔴 ${rewritten.title}
-
-${rewritten.article}
-
-📰 IBRAHIM SANI NEWS (ISN)
-
-#ISN #IbrahimSaniNews`;
-
-      /*
-      |--------------------------------------------------------------------------
-      | MAKE → FACEBOOK
-      |--------------------------------------------------------------------------
-      */
-
-      await sendNewsToMake({
-        title:
-          rewritten.title,
-
-        article:
-          rewritten.article,
-
-        caption:
-          facebookCaption,
-
-        /*
-        |--------------------------------------------------------------------------
-        | VERY IMPORTANT:
-        | Make receives generated ISN image URL.
-        |--------------------------------------------------------------------------
-        */
-
-        image_url:
-          imageUrl,
-
+      queueRows.push({
+        title: item.title,
+        article,
+        caption,
+        image_url: null,
         category,
-
-        source_url:
-          item.link,
+        source_url: item.link,
+        status: "queued",
+        scheduled_at:
+          new Date().toISOString(),
+        attempts: 0,
       });
 
-      /*
-      |--------------------------------------------------------------------------
-      | ONLY ONE NEWS PER CRON RUN
-      |--------------------------------------------------------------------------
-      */
+      queuedTitles.add(
+        normalizedTitle
+      );
 
-      break;
+      queuedUrls.add(
+        normalizedUrl
+      );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | INSERT QUEUE
+    |--------------------------------------------------------------------------
+    */
+
+    if (!queueRows.length) {
+      return NextResponse.json({
+        success: true,
+        found: items.length,
+        queued: 0,
+        message:
+          "Babu sabon labari da bai riga ya shiga Queue ba.",
+      });
+    }
+
+    const {
+      data: inserted,
+      error: insertError,
+    } = await supabase
+      .from("news_queue")
+      .insert(queueRows)
+      .select(
+        "id,title,category,status"
+      );
+
+    if (insertError) {
+      throw insertError;
     }
 
     /*
@@ -1192,17 +664,14 @@ ${rewritten.article}
     return NextResponse.json({
       success: true,
       found: items.length,
-      published:
-        publishedCount,
-
+      queued:
+        inserted?.length || 0,
       message:
-        publishedCount > 0
-          ? "Sabon labari da ORIGINAL ISN graphic an shirya kuma an aika."
-          : "Ba a samu sabon labari da ya dace ba.",
+        `${inserted?.length || 0} sabbin labarai an saka su cikin Queue.`,
     });
   } catch (error) {
     console.error(
-      "AUTO NEWS ERROR:",
+      "AUTO NEWS QUEUE ERROR:",
       error
     );
 
@@ -1212,7 +681,7 @@ ${rewritten.article}
         error:
           error instanceof Error
             ? error.message
-            : "Auto-news failed.",
+            : "Auto-news queue failed.",
       },
       { status: 500 }
     );
