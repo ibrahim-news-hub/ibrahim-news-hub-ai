@@ -55,7 +55,6 @@ function normalizeUrl(url: string): string {
   }
 }
 
-
 function absoluteUrl(value: string, baseUrl: string) {
   if (!value) return "";
 
@@ -86,7 +85,7 @@ function getCategory(title: string) {
   }
 
   if (
-    /business|economy|market|bank|oil|finance|dollar|investment|company|economy/.test(
+    /business|economy|market|bank|oil|finance|dollar|investment|company/.test(
       text
     )
   ) {
@@ -240,6 +239,53 @@ async function getOgMedia(link: string) {
   }
 }
 
+async function sendNewsToMake(payload: {
+  title: string;
+  article: string;
+  caption: string;
+  image_url: string;
+  category: string;
+  source_url: string;
+}) {
+  const webhookUrl = process.env.MAKE_WEBHOOK_URL;
+
+  if (!webhookUrl) {
+    console.error("MAKE_WEBHOOK_URL is missing.");
+    return;
+  }
+
+  try {
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+
+      console.error(
+        "MAKE WEBHOOK ERROR:",
+        response.status,
+        errorText
+      );
+
+      return;
+    }
+
+    console.log(
+      "MAKE WEBHOOK: News sent successfully."
+    );
+  } catch (error) {
+    console.error(
+      "MAKE WEBHOOK FETCH ERROR:",
+      error
+    );
+  }
+}
+
 async function getFeedItems(): Promise<NewsItem[]> {
   const feeds = [
     {
@@ -343,7 +389,9 @@ async function rewriteNewsWithAI(
   const apiKey = process.env.GROQ_API_KEY;
 
   if (!apiKey) {
-    throw new Error("GROQ_API_KEY is missing.");
+    throw new Error(
+      "GROQ_API_KEY is missing."
+    );
   }
 
   const prompt = `
@@ -558,7 +606,9 @@ export async function GET(request: Request) {
       error: recentError,
     } = await supabase
       .from("news")
-      .select("id,title,source,source_name,source_url")
+      .select(
+        "id,title,source,source_name,source_url"
+      )
       .order("created_at", {
         ascending: false,
       })
@@ -574,22 +624,34 @@ export async function GET(request: Request) {
       const normalizedTitle =
         normalizeTitle(item.title);
 
-      const normalizedUrl = normalizeUrl(item.link);
+      const normalizedUrl =
+        normalizeUrl(item.link);
 
-    const duplicate =
-      (recentNews || []).some((news) => {
-        const oldUrl = news.source_url
-          ? normalizeUrl(news.source_url)
-          : (() => {
-              const parts = String(news.source || "").split(" — ");
-              return parts.length > 1 ? normalizeUrl(parts.slice(1).join(" — ")) : "";
-            })();
+      const duplicate =
+        (recentNews || []).some((news) => {
+          const oldUrl = news.source_url
+            ? normalizeUrl(news.source_url)
+            : (() => {
+                const parts = String(
+                  news.source || ""
+                ).split(" — ");
 
-        return (
-          (oldUrl && oldUrl === normalizedUrl) ||
-          normalizeTitle(news.title) === normalizedTitle
-        );
-      });
+                return parts.length > 1
+                  ? normalizeUrl(
+                      parts
+                        .slice(1)
+                        .join(" — ")
+                    )
+                  : "";
+              })();
+
+          return (
+            (oldUrl &&
+              oldUrl === normalizedUrl) ||
+            normalizeTitle(news.title) ===
+              normalizedTitle
+          );
+        });
 
       if (duplicate) {
         continue;
@@ -633,8 +695,10 @@ export async function GET(request: Request) {
             source_name: item.source,
             source_url: item.link,
             category,
-            image_url: imageUrl || null,
-            video_url: videoUrl || null,
+            image_url:
+              imageUrl || null,
+            video_url:
+              videoUrl || null,
             published: true,
             views: 0,
             is_breaking: false,
@@ -650,6 +714,27 @@ export async function GET(request: Request) {
       }
 
       publishedCount++;
+
+      const facebookCaption = `🔴 ${rewritten.title}
+
+${rewritten.article}
+
+📰 IBRAHIM SANI NEWS (ISN)`;
+
+      if (imageUrl) {
+        await sendNewsToMake({
+          title: rewritten.title,
+          article: rewritten.article,
+          caption: facebookCaption,
+          image_url: imageUrl,
+          category,
+          source_url: item.link,
+        });
+      } else {
+        console.log(
+          "MAKE WEBHOOK SKIPPED: No image URL available."
+        );
+      }
 
       break;
     }
@@ -680,4 +765,4 @@ export async function GET(request: Request) {
       { status: 500 }
     );
   }
-}
+  }
