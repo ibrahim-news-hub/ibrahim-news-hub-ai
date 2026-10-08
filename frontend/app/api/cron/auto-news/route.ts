@@ -900,6 +900,9 @@ export async function GET(
         "authorization"
       );
 
+    const testMode =
+      new URL(request.url).searchParams.get("test") === "1";
+
     const cronSecret =
       process.env.CRON_SECRET;
 
@@ -1005,7 +1008,7 @@ export async function GET(
           }
         );
 
-      if (duplicate) {
+      if (duplicate && !testMode) {
         continue;
       }
 
