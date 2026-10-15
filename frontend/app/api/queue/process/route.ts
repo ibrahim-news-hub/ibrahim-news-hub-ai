@@ -277,7 +277,7 @@ async function uploadImage(
     );
   }
 
-  const logoPath = `${process.cwd()}/public/ibrahim-sani-news-logo.png`;
+  const logoPath = `${process.cwd()}/public/ibrahim-sani-news-logo-transparent.png`;
 
   const logoBuffer = await sharp(logoPath)
     .rotate()
