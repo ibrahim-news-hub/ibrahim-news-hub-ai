@@ -1,3 +1,4 @@
+import sharp from "sharp";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
@@ -50,21 +51,53 @@ async function rewriteWithGroq(item: QueueItem) {
           type: "json_object",
         },
         messages: [
-          {
-            role: "system",
-            content:
-              "Kai kwararren editan labaran Hausa na Ibrahim Sani News (ISN). Ka sake rubuta labarin cikin Hausa mai sauki, sahihiya kuma ta jarida. Kada ka kirkiri bayanan da babu su a asalin labarin. Ka dawo da JSON kawai mai dauke da title, article da caption.",
-          },
-          {
-            role: "user",
-            content: JSON.stringify({
-              title: item.title,
-              article: item.article,
-              category: item.category,
-              source_url: item.source_url,
-            }),
-          },
-        ],
+  {
+    role: "system",
+    content: `
+Kai ne babban editan labarai na IBRAHIM SANI NEWS (ISN), ƙwararren ɗan jarida mai ƙwarewa a rubutun Hausa.
+
+MANUFARKA:
+Ka mayar da bayanan da aka ba ka zuwa ingantaccen labarin Hausa mai sauƙin fahimta, sahihi, ƙwarewa kuma mai jan hankalin masu karatu.
+
+KA'IDOJIN RUBUTU:
+
+1. Ka rubuta cikin ingantacciyar Hausa ta zamani wadda masu karatu a Arewa da sauran masu magana da Hausa za su fahimta.
+2. Ka yi amfani da salon ƙwararrun kafafen labarai: bayyananne, tsararre, mai mutunta gaskiya kuma ba mai son zuciya ba.
+3. Ka gyara kurakuran nahawu, rubutu, tsarin jimloli da amfani da kalmomi.
+4. Ka samar da kanun labari mai jan hankali, amma kada ka yi amfani da kanun yaudara ko ƙarin gishiri.
+5. Ka fara labarin da muhimmin abin da ya faru, idan bayanan asali sun tabbatar da shi.
+6. Ka raba labari zuwa sakin layi masu gajarta domin ya dace da karatun waya da Facebook.
+7. Ka bayyana wanda ya yi magana, abin da ya faru, da inda ko lokacin da ya faru idan bayanan asali sun ƙunshi waɗannan bayanai.
+8. Kada ka ƙirƙiri sunaye, lambobi, wurare, ranaku, zarge-zarge, ƙididdiga, maganganu ko wasu bayanai da ba su cikin tushen labarin.
+9. Kada ka gabatar da jita-jita ko zargi a matsayin tabbatacciyar gaskiya.
+10. Idan bayanai ba su isa tabbatar da wani abu ba, kada ka yi hasashe ko ƙara bayanin da ba a bayar ba.
+11. Kada ka sauya ma'anar labarin ko manufar wanda aka ambata.
+12. Ka kiyaye sunayen mutane, ƙungiyoyi, kamfanoni da wurare yadda suke a asalin labarin.
+13. Kada ka ƙara ra'ayinka na kanka, siyasa, addini ko nuna goyon baya ga wani ɓangare.
+14. Kada ka yi amfani da kalmomin “DA DUMI-DUMI” ko “BREAKING NEWS” sai idan bayanan da aka bayar sun nuna cewa labarin sabon abu ne kuma ya cancanci hakan.
+15. Idan asalin labarin ya yi gajarta, ka inganta shi ba tare da ƙirƙirar ƙarin bayanai ba.
+16. Caption ya zama taƙaitaccen bayani mai jan hankali, ba cikakken labarin da aka maimaita ba.
+17. Kada ka saka hashtags masu yawa. Ka yi amfani da #ISN da #IbrahimSaniNews kawai idan sun dace.
+
+ABIN DA ZA KA MAYAR:
+Ka mayar da JSON mai ingantattun filaye uku kawai:
+- "title": Kanun labari a Hausa.
+- "article": Cikakken labari a Hausa.
+- "caption": Taƙaitaccen rubutun Facebook a Hausa, tare da #ISN #IbrahimSaniNews.
+
+Ka dawo da JSON kawai. Kada ka ƙara bayanin gabatarwa, Markdown ko wani rubutu a wajen JSON.
+`,
+  },
+  {
+    role: "user",
+    content: JSON.stringify({
+      title: item.title,
+      article: item.article,
+      category: item.category,
+      source_url: item.source_url,
+    }),
+  },
+],
       }),
     }
   );
@@ -217,7 +250,6 @@ async function uploadImage(
   queueId: string
 ) {
   let buffer: Buffer;
-  let contentType = "image/png";
 
   if (image.startsWith("data:")) {
     const match = image.match(
@@ -230,7 +262,6 @@ async function uploadImage(
       );
     }
 
-    contentType = match[1];
     buffer = Buffer.from(match[2], "base64");
   } else {
     const imageResponse = await fetch(image);
@@ -241,40 +272,83 @@ async function uploadImage(
       );
     }
 
-    contentType =
-      imageResponse.headers.get(
-        "content-type"
-      ) || "image/png";
-
     buffer = Buffer.from(
       await imageResponse.arrayBuffer()
     );
   }
 
-  const extension =
-    contentType.includes("jpeg") ||
-    contentType.includes("jpg")
-      ? "jpg"
-      : "png";
+  const logoPath = `${process.cwd()}/public/ibrahim-sani-news-logo-transparent.png`;
 
-  const path = `isn-${queueId}-${Date.now()}.${extension}`;
+  const logoBuffer = await sharp(logoPath)
+    .rotate()
+    .resize({
+      width: 110,
+      height: 110,
+      fit: "inside",
+      withoutEnlargement: true,
+    })
+    .png()
+    .toBuffer();
 
-  const { error } =
-    await supabase.storage
-      .from("news-images")
-      .upload(path, buffer, {
-        contentType,
-        upsert: false,
-      });
+  const imageMetadata = await sharp(buffer)
+    .rotate()
+    .metadata();
+
+  if (!imageMetadata.width || !imageMetadata.height) {
+    throw new Error(
+      "Could not determine generated image dimensions."
+    );
+  }
+
+  const logoMetadata = await sharp(logoBuffer).metadata();
+
+  if (!logoMetadata.width || !logoMetadata.height) {
+    throw new Error(
+      "Could not determine ISN logo dimensions."
+    );
+  }
+
+  const margin = 24;
+  const left = Math.max(
+    0,
+    imageMetadata.width - logoMetadata.width - margin
+  );
+  const top = Math.min(
+    margin,
+    Math.max(0, imageMetadata.height - logoMetadata.height)
+  );
+
+  buffer = await sharp(buffer)
+    .rotate()
+    .composite([
+      {
+        input: logoBuffer,
+        left,
+        top,
+      },
+    ])
+    .jpeg({
+      quality: 90,
+      mozjpeg: true,
+    })
+    .toBuffer();
+
+  const path = `isn-${queueId}-${Date.now()}.jpg`;
+
+  const { error } = await supabase.storage
+    .from("news-images")
+    .upload(path, buffer, {
+      contentType: "image/jpeg",
+      upsert: false,
+    });
 
   if (error) {
     throw error;
   }
 
-  const { data } =
-    supabase.storage
-      .from("news-images")
-      .getPublicUrl(path);
+  const { data } = supabase.storage
+    .from("news-images")
+    .getPublicUrl(path);
 
   if (!data?.publicUrl) {
     throw new Error(
